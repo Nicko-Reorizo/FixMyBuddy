@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom';
 
 const variants = {
-  primary: 'bg-brand-600 text-white hover:bg-brand-700',
-  secondary: 'bg-slate-900 text-white hover:bg-slate-800',
-  ghost: 'bg-transparent text-slate-700 hover:bg-slate-100',
+  primary: 'primary-action',
+  secondary: 'secondary-action',
+  muted: 'muted-action',
+  ghost: 'inline-flex h-11 items-center justify-center rounded-lg px-3 text-sm font-semibold text-slate-300 transition hover:bg-white/5 hover:text-white',
 };
 
 export function Button({
@@ -14,7 +15,7 @@ export function Button({
   variant = 'primary',
   ...props
 }) {
-  const classes = `inline-flex h-10 items-center justify-center rounded px-4 text-sm font-semibold transition ${variants[variant]} ${className}`;
+  const classes = `${variants[variant]} ${className}`.trim();
 
   if (to) {
     return (

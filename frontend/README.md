@@ -1,6 +1,6 @@
 # FixMyBuddy Frontend
 
-React + Vite frontend for the FixMyBuddy MERN stack app.
+React + Tailwind CSS frontend for the FixMyBuddy roadside assistance app.
 
 ## Tech Stack
 
@@ -8,7 +8,6 @@ React + Vite frontend for the FixMyBuddy MERN stack app.
 - Vite
 - Tailwind CSS
 - React Router
-- Axios
 - Lucide React icons
 
 ## Getting Started
@@ -18,11 +17,7 @@ npm install
 npm run dev
 ```
 
-Copy `.env.example` to `.env` when you are ready to connect the Express API.
-
-```bash
-VITE_API_BASE_URL=http://localhost:5000/api
-```
+The location screen uses browser geolocation when permission is granted. Provider results are loaded through `src/services/providerService.js`, which is ready to connect to the future backend and does not ship fake provider records.
 
 ## Scripts
 

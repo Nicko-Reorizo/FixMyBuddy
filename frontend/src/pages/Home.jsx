@@ -1,81 +1,96 @@
-import { ArrowRight, CalendarCheck, ShieldCheck, Wrench } from 'lucide-react';
+import { ArrowRight, CheckCircle2, MapPinned, ShieldCheck, Wrench } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 
-const highlights = [
-  {
-    icon: Wrench,
-    title: 'Find trusted help',
-    copy: 'Connect with local repair specialists for common home and device issues.',
-  },
-  {
-    icon: CalendarCheck,
-    title: 'Book faster',
-    copy: 'Plan service requests with clear details before the backend is connected.',
-  },
-  {
-    icon: ShieldCheck,
-    title: 'Keep it organized',
-    copy: 'Start with clean frontend structure that can grow with the MERN API.',
-  },
+const benefits = [
+  'Share your live location or enter an address.',
+  'Request towing or mechanic assistance.',
+  'Review request details before searching.',
 ];
 
 export function Home() {
   return (
-    <section className="container-page py-16 sm:py-20">
-      <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
-        <div>
-          <p className="text-sm font-semibold uppercase tracking-wide text-brand-700">
-            Repair requests made simple
-          </p>
-          <h1 className="mt-4 max-w-3xl text-4xl font-bold leading-tight text-ink sm:text-5xl">
-            Get the right buddy for the fix.
-          </h1>
-          <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-600">
-            FixMyBuddy helps users request repairs, compare services, and manage bookings from one clean dashboard.
-          </p>
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Button to="/services" className="gap-2">
-              View services <ArrowRight size={17} />
-            </Button>
-            <Button to="/register" variant="secondary">
-              Create account
-            </Button>
+    <section className="screen overflow-hidden">
+      <div className="flex min-h-[calc(100vh-3.5rem)] flex-col">
+        <header className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-sm font-bold">
+            <Wrench className="text-amber-300" size={18} strokeWidth={2} />
+            <span>FixMyBuddy</span>
           </div>
-        </div>
+          <Button to="/app" variant="ghost" className="h-10 px-4">
+            Open App
+          </Button>
+        </header>
 
-        <div className="rounded border border-slate-200 bg-white p-6 shadow-soft">
-          <div className="rounded bg-slate-100 p-5">
-            <p className="text-sm font-semibold text-slate-500">Sample request</p>
-            <h2 className="mt-3 text-2xl font-bold text-ink">Aircon cleaning needed</h2>
-            <p className="mt-3 text-slate-600">
-              Quezon City, preferred schedule this weekend, includes diagnosis and quote.
+        <div className="grid flex-1 items-center gap-10 py-12 lg:grid-cols-[1.05fr_0.95fr]">
+          <div className="max-w-2xl">
+            <p className="inline-flex rounded-full border border-amber-300/30 bg-amber-300/10 px-4 py-2 text-sm font-semibold text-amber-200">
+              On-demand towing and mechanic assistance
             </p>
-            <div className="mt-6 grid gap-3 text-sm text-slate-600">
-              <div className="flex justify-between rounded bg-white px-4 py-3">
-                <span>Status</span>
-                <span className="font-semibold text-brand-700">Pending match</span>
-              </div>
-              <div className="flex justify-between rounded bg-white px-4 py-3">
-                <span>Category</span>
-                <span className="font-semibold text-slate-900">Home repair</span>
-              </div>
-              <div className="flex justify-between rounded bg-white px-4 py-3">
-                <span>Priority</span>
-                <span className="font-semibold text-slate-900">Normal</span>
+            <h1 className="mt-6 text-5xl font-extrabold leading-tight text-white sm:text-6xl lg:text-7xl">
+              When your ride stops, <span className="text-amber-300">we get you moving.</span>
+            </h1>
+            <p className="mt-6 max-w-xl text-base leading-8 text-slate-300 sm:text-lg">
+              FixMyBuddy helps motorists start a roadside assistance request, confirm their location, and search for available towing or mechanic providers.
+            </p>
+
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Button to="/app" className="sm:w-auto">
+                Get help now
+                <ArrowRight size={20} />
+              </Button>
+              <Button to="/request?service=towing" variant="secondary" className="sm:w-auto">
+                Request towing
+              </Button>
+            </div>
+
+            <div className="mt-8 grid gap-3 text-sm text-slate-300">
+              {benefits.map((benefit) => (
+                <div key={benefit} className="flex items-center gap-3">
+                  <CheckCircle2 className="text-teal-300" size={18} />
+                  <span>{benefit}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="relative">
+            <div className="absolute -inset-6 rounded-[2rem] border border-amber-300/10 bg-amber-300/5 blur-2xl" />
+            <div className="relative mx-auto max-w-sm rounded-[2rem] border border-white/10 bg-slate-900/70 p-5 shadow-2xl shadow-black/30">
+              <div className="rounded-[1.5rem] bg-[#151a30] p-5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-sm font-bold">
+                    <Wrench size={16} />
+                    <span>FixMyBuddy</span>
+                  </div>
+                  <span className="rounded-full bg-lime-400/15 px-3 py-1 text-xs font-bold text-lime-300">GPS ready</span>
+                </div>
+
+                <div className="mt-12 text-center">
+                  <div className="mx-auto grid h-28 w-28 place-items-center rounded-full border border-white/10 bg-slate-800 text-amber-300">
+                    <MapPinned size={50} strokeWidth={1.8} />
+                  </div>
+                  <h2 className="mt-6 text-2xl font-extrabold">Roadside request</h2>
+                  <p className="mt-3 text-sm leading-6 text-slate-400">
+                    Choose service, describe the issue, confirm location.
+                  </p>
+                </div>
+
+                <div className="mt-8 space-y-3">
+                  <div className="rounded-lg bg-amber-300 px-4 py-4 text-center font-bold text-slate-950">
+                    Request Mechanic
+                  </div>
+                  <div className="rounded-lg bg-slate-700 px-4 py-4 text-center font-bold text-white">
+                    Request Towing
+                  </div>
+                  <div className="flex items-center gap-3 rounded-lg border border-white/10 bg-slate-800 px-4 py-4 text-sm text-slate-300">
+                    <ShieldCheck className="text-teal-300" size={20} />
+                    <span>Review details before searching.</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-
-      <div className="mt-16 grid gap-4 md:grid-cols-3">
-        {highlights.map((item) => (
-          <article key={item.title} className="rounded border border-slate-200 bg-white p-5 shadow-sm">
-            <item.icon className="text-brand-600" size={24} />
-            <h2 className="mt-4 text-lg font-semibold text-ink">{item.title}</h2>
-            <p className="mt-2 text-sm leading-6 text-slate-600">{item.copy}</p>
-          </article>
-        ))}
       </div>
     </section>
   );

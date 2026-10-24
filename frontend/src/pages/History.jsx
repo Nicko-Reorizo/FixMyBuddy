@@ -1,43 +1,101 @@
-import { ScreenHeader } from '../components/app/ScreenHeader';
-import { ProviderCard } from '../components/app/ProviderCard';
-import { Button } from '../components/ui/Button';
-import { useApp } from '../context/useApp';
+import { useState } from 'react';
+import { CalendarDays } from 'lucide-react';
+import { Link, useSearchParams } from 'react-router-dom';
+import { AuthNotice } from '../components/auth/AuthControls';
+import { BookingSummary } from '../components/customer/BookingSummary';
+import { CustomerHeading } from '../components/customer/CustomerHeading';
+import { useAuth } from '../context/useAuth';
+import { useCustomer } from '../context/useCustomer';
+import { BookingPayment } from '../components/customer/BookingPayment';
 
 export function History() {
-  const { history } = useApp();
-
+  const { user } = useAuth();
+  const { bookings, bookingStatus, refreshData } = useCustomer();
+  const [params] = useSearchParams();
+  const [filter, setFilter] = useState('all');
+  const filtered = bookings.filter(
+    (item) =>
+      filter === 'all' ||
+      (filter === 'upcoming'
+        ? !['completed', 'cancelled', 'rejected'].includes(item.status)
+        : item.status === filter),
+  );
+  const focused = bookings.find((item) => item.id === params.get('booking'));
   return (
-    <section className="screen">
-      <div className="mobile-column">
-        <ScreenHeader title="Service History" subtitle="Completed requests" backTo="/app" />
-
-        <div className="mt-6 space-y-3">
-          {history.length > 0 ? (
-            history.map((item) => (
-              <ProviderCard
-                key={item.id}
-                name={item.providerName}
-                issueType={item.issueType}
-                distanceKm={0}
-                rating={item.rating}
-                reviews={0}
-                completedPrice={item.amount}
-              />
-            ))
-          ) : (
-            <div className="panel px-5 py-8 text-center">
-              <h2 className="text-lg font-bold text-white">No completed requests yet</h2>
-              <p className="mt-2 text-sm leading-6 text-slate-400">
-                Confirmed service requests will appear here.
-              </p>
-              <Button to="/" className="mt-6">
-                Start a request
-              </Button>
-            </div>
-          )}
-        </div>
+    <>
+      <CustomerHeading title="Service history" backTo="/app">
+        Your past and upcoming assistance.
+      </CustomerHeading>
+      <div
+        className="customer-history-filters"
+        role="group"
+        aria-label="Filter bookings"
+      >
+        {[
+          ['all', 'All'],
+          ['upcoming', 'Upcoming'],
+          ['completed', 'Completed'],
+          ['cancelled', 'Cancelled'],
+        ].map(([value, label]) => (
+          <button
+            key={value}
+            type="button"
+            aria-pressed={filter === value}
+            onClick={() => setFilter(value)}
+          >
+            {label}
+          </button>
+        ))}
       </div>
-    </section>
+      {bookingStatus === 'loading' ? (
+        <p role="status" className="customer-muted">
+          Loading bookings...
+        </p>
+      ) : bookingStatus === 'error' ? (
+        <AuthNotice error>
+          Could not load bookings.{' '}
+          <button
+            type="button"
+            onClick={refreshData}
+            className="customer-text-button"
+          >
+            Try again
+          </button>
+        </AuthNotice>
+      ) : focused ? (
+        <section className="customer-booking-detail">
+          <div className="customer-section-heading">
+            <h2>Booking details</h2>
+            <Link to="/history">Show all</Link>
+          </div>
+          <BookingSummary booking={focused} />
+          {focused.notes && <p className="customer-muted">{focused.notes}</p>}
+          <BookingPayment key={`${focused.id}-${focused.repairEstimate?.id}-${focused.repairEstimate?.version}`} booking={focused} onRefresh={refreshData} />
+        </section>
+      ) : filtered.length ? (
+        <div className="customer-history-list">
+          {filtered.map((item) => (
+            <BookingSummary key={item.id} booking={item} />
+          ))}
+        </div>
+      ) : (
+        <div className="customer-empty">
+          <CalendarDays size={33} />
+          <h2>
+            {user
+              ? 'No bookings here yet'
+              : 'Keep your roadside history together'}
+          </h2>
+          <p>
+            {user
+              ? 'Your confirmed requests will appear here. A request is only completed when the service is finished.'
+              : 'Sign in to view your scheduled and past assistance.'}
+          </p>
+          <Link to={user ? '/app' : '/login'} className="auth-secondary">
+            {user ? 'Request assistance' : 'Sign in'}
+          </Link>
+        </div>
+      )}
+    </>
   );
 }
-

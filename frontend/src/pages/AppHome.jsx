@@ -1,106 +1,271 @@
-import { Clock3, Crosshair, History as HistoryIcon, LifeBuoy, MapPinned, Wrench } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { LocationCard } from '../components/app/LocationCard';
-import { Button } from '../components/ui/Button';
+import { useRef, useState } from 'react';
+import {
+  CalendarDays,
+  ChevronDown,
+  LocateFixed,
+  MapPin,
+  Plus,
+  Truck,
+  Wrench,
+} from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { AuthNotice } from '../components/auth/AuthControls';
+import { BookingSummary } from '../components/customer/BookingSummary';
+import { CustomerHeading } from '../components/customer/CustomerHeading';
+import { VehicleIcon } from '../components/customer/VehicleIcon';
+import { PickupPreview } from './auth/Welcome';
 import { useApp } from '../context/useApp';
-import { serviceOptions } from '../data/serviceOptions';
+import { useAuth } from '../context/useAuth';
+import { useCustomer } from '../context/useCustomer';
+import { useGeolocation } from '../hooks/useGeolocation';
+import { localDateTime, validateSchedule } from '../utils/vehicleValidation';
 
 export function AppHome() {
-  const { resetRequest } = useApp();
+  const { user } = useAuth();
+  const {
+    selectedVehicle,
+    vehicles,
+    vehicleStatus,
+    bookings,
+    bookingStatus,
+    refreshData,
+  } = useCustomer();
+  const { location, setLocation, request, resetRequest, updateRequest } =
+    useApp();
+  const { requestLocation, status, error: locationError } = useGeolocation();
+  const [timing, setTiming] = useState(
+    request.scheduledAt ? 'scheduled' : 'now',
+  );
+  const [scheduledAt, setScheduledAt] = useState(
+    request.scheduledAt ? localDateTime(new Date(request.scheduledAt)) : '',
+  );
+  const [error, setError] = useState('');
+  const scheduleInput = useRef(null);
+  const navigate = useNavigate();
+  const name =
+    typeof user?.name === 'string' ? user.name.trim().split(/\s+/)[0] : '';
+  const upcoming = bookings
+    .filter(
+      (item) => !['completed', 'cancelled', 'rejected'].includes(item.status),
+    )
+    .sort(
+      (a, b) =>
+        Date.parse(a.scheduledAt || a.createdAt) -
+        Date.parse(b.scheduledAt || b.createdAt),
+    );
+  const gpsActive =
+    location.source === 'GPS active' && Number.isFinite(location.latitude);
+
+  async function locate() {
+    const next = await requestLocation();
+    if (next) setLocation((current) => ({ ...current, ...next }));
+  }
+
+  function start(service) {
+    if (vehicleStatus === 'loading' || vehicleStatus === 'error') return;
+    const selectedTime = scheduleInput.current?.value || scheduledAt;
+    const scheduleError =
+      timing === 'scheduled' ? validateSchedule(selectedTime) : '';
+    setError(scheduleError);
+    if (scheduleError) {
+      scheduleInput.current?.focus();
+      return;
+    }
+    resetRequest(service);
+    updateRequest({
+      vehicleId: selectedVehicle?.id || '',
+      scheduledAt:
+        timing === 'scheduled' ? new Date(selectedTime).toISOString() : null,
+    });
+    navigate(
+      selectedVehicle
+        ? `/request?service=${service}`
+        : `/vehicles?continue=${service}`,
+    );
+  }
 
   return (
-    <section className="screen web-grid">
-      <div className="mobile-column flex min-h-[calc(100vh-3.5rem)] flex-col lg:min-h-0">
-        <header className="flex items-start justify-between pt-5 lg:pt-0">
-          <div>
-            <div className="flex items-center gap-2 text-sm font-bold">
-              <Wrench size={16} strokeWidth={2} />
-              <span>FixMyBuddy</span>
-            </div>
-            <p className="mt-1 inline-flex rounded bg-slate-700/50 px-1.5 py-0.5 text-xs italic text-slate-400">
-              Roadside assistance
-            </p>
-          </div>
-          <Button to="/history" variant="ghost" className="h-10 w-10 rounded-full p-0" aria-label="History">
-            <Clock3 size={22} strokeWidth={2} />
-          </Button>
-        </header>
-
-        <div className="flex flex-1 flex-col justify-center py-10">
-          <div className="mx-auto grid h-36 w-36 place-items-center rounded-full border border-white/10 bg-slate-800/50 text-amber-300">
-            <Crosshair size={72} strokeWidth={1.8} />
-          </div>
-
-          <div className="mx-auto mt-8 max-w-xs text-center">
-            <h1 className="text-3xl font-extrabold leading-tight">Need Roadside Assistance?</h1>
-            <p className="mt-3 text-sm italic leading-5 text-slate-200">
-              When your ride stops, we get you moving.
-            </p>
-          </div>
-
-          <div className="mt-8">
-            <LocationCard compact />
-          </div>
-        </div>
-
-        <div className="space-y-4 pb-8 lg:pb-0">
-          {serviceOptions.map((service, index) => (
-            <Button
-              key={service.id}
-              to={`/request?service=${service.id}`}
-              variant={index === 0 ? 'primary' : 'secondary'}
-              className="text-lg"
-              onClick={() => resetRequest(service.id)}
-            >
-              <service.icon size={28} strokeWidth={2} />
-              {service.label}
-            </Button>
-          ))}
-
-          <div className="grid grid-cols-3 gap-4">
-            <Button to="/history" variant="secondary" className="h-[76px] flex-col gap-1 rounded-lg text-xs">
-              <HistoryIcon size={23} strokeWidth={2} />
-              History
-            </Button>
-            <Button to="/confirm-location" variant="secondary" className="h-[76px] flex-col gap-1 rounded-lg text-xs">
-              <MapPinned size={23} strokeWidth={2} />
-              Location
-            </Button>
-            <Button to="/no-providers" variant="secondary" className="h-[76px] flex-col gap-1 rounded-lg text-xs">
-              <LifeBuoy size={23} strokeWidth={2} />
-              Search
-            </Button>
-          </div>
-        </div>
+    <>
+      <CustomerHeading
+        title={name ? `We've got you, ${name}.` : "We've got you."}
+      >
+        Roadside help, without the guesswork.
+      </CustomerHeading>
+      <div className="customer-location-row">
+        <Link to="/location">
+          <MapPin size={19} />
+          <span>
+            {gpsActive
+              ? location.address
+              : location.source === 'Manual address'
+                ? location.address
+                : 'Set your pickup location'}
+          </span>
+        </Link>
+        <button type="button" onClick={locate} disabled={status === 'loading'}>
+          {status === 'loading'
+            ? 'Locating...'
+            : gpsActive
+              ? 'GPS active'
+              : 'Use GPS'}
+        </button>
       </div>
-
-      <aside className="hidden lg:block">
-        <div className="rounded-2xl border border-white/10 bg-slate-900/45 p-7">
-          <p className="text-sm font-semibold uppercase tracking-wide text-amber-300">Responsive app flow</p>
-          <h2 className="mt-3 text-3xl font-extrabold leading-tight">Fast help request flow for stranded motorists.</h2>
-          <p className="mt-4 text-sm leading-6 text-slate-300">
-            Choose the service, describe the issue, confirm the location, and search for available providers.
-          </p>
-
-          <div className="mt-6 grid gap-3">
-            {serviceOptions.map((service) => (
-              <Link
-                key={service.id}
-                to={`/request?service=${service.id}`}
-                onClick={() => resetRequest(service.id)}
-                className="rounded-xl border border-white/10 bg-slate-800/70 p-4 transition hover:border-amber-300/60"
-              >
-                <div className="flex items-center gap-3">
-                  <service.icon className="text-amber-300" size={22} strokeWidth={2} />
-                  <span className="font-bold text-white">{service.shortLabel}</span>
-                </div>
-                <p className="mt-2 text-sm leading-6 text-slate-400">{service.description}</p>
-              </Link>
-            ))}
+      <div className="customer-map">
+        <PickupPreview
+          onLocate={locate}
+          locating={status === 'loading'}
+          compact
+        />
+      </div>
+      {locationError && <AuthNotice error>{locationError}</AuthNotice>}
+      <Link to="/vehicles" className="customer-vehicle-selector">
+        <span className="customer-yellow">
+          {selectedVehicle ? (
+            <VehicleIcon type={selectedVehicle.type} />
+          ) : (
+            <Plus size={23} />
+          )}
+        </span>
+        <span>
+          <strong>
+            {vehicleStatus === 'loading'
+              ? 'Loading vehicles...'
+              : selectedVehicle
+                ? `${selectedVehicle.make} ${selectedVehicle.model} · ${selectedVehicle.year}`
+                : vehicles.length
+                  ? 'Choose your vehicle'
+                  : 'Add your vehicle'}
+          </strong>
+          <small>
+            {selectedVehicle
+              ? [
+                  selectedVehicle.color,
+                  selectedVehicle.plate || 'No plate added',
+                ].join(' · ')
+              : 'Select the ride that needs a buddy.'}
+          </small>
+        </span>
+        <ChevronDown size={18} />
+      </Link>
+      {vehicleStatus === 'error' && (
+        <AuthNotice error>
+          We could not load your vehicles.{' '}
+          <button
+            type="button"
+            className="customer-text-button"
+            onClick={refreshData}
+          >
+            Try again
+          </button>
+        </AuthNotice>
+      )}
+      <div
+        className="auth-segments customer-timing"
+        role="group"
+        aria-label="When do you need help?"
+      >
+        <button
+          type="button"
+          aria-pressed={timing === 'now'}
+          onClick={() => setTiming('now')}
+        >
+          Help now
+        </button>
+        <button
+          type="button"
+          aria-pressed={timing === 'scheduled'}
+          onClick={() => setTiming('scheduled')}
+        >
+          <CalendarDays size={16} /> Schedule for later
+        </button>
+      </div>
+      {timing === 'scheduled' && (
+        <div className="auth-field customer-schedule">
+          <label htmlFor="schedule-time">Preferred date & time</label>
+          <div className="auth-input-wrap">
+            <input
+              id="schedule-time"
+              ref={scheduleInput}
+              type="datetime-local"
+              min={localDateTime()}
+              value={scheduledAt}
+              onChange={(event) => {
+                setScheduledAt(event.target.value);
+                setError('');
+              }}
+              aria-describedby="schedule-hint"
+            />
           </div>
+          <p id="schedule-hint" className="auth-hint">
+            Uses your device&apos;s local time. Availability is confirmed when
+            you book.
+          </p>
         </div>
-      </aside>
-    </section>
+      )}
+      {error && <AuthNotice error>{error}</AuthNotice>}
+      <div className="customer-service-actions">
+        <button
+          type="button"
+          className="auth-primary"
+          onClick={() => start('mechanic')}
+          disabled={vehicleStatus !== 'ready'}
+        >
+          <Wrench size={22} /> Request Mechanic
+        </button>
+        <button
+          type="button"
+          className="auth-secondary"
+          onClick={() => start('towing')}
+          disabled={vehicleStatus !== 'ready'}
+        >
+          <Truck size={22} /> Request Towing
+        </button>
+      </div>
+      <section className="customer-bookings">
+        <div className="customer-section-heading">
+          <h2>Your next booking</h2>
+          <Link to="/history">View all</Link>
+        </div>
+        {bookingStatus === 'loading' ? (
+          <p className="customer-muted" role="status">
+            Loading your bookings...
+          </p>
+        ) : bookingStatus === 'error' ? (
+          <AuthNotice error>
+            Could not load bookings.{' '}
+            <button
+              type="button"
+              onClick={refreshData}
+              className="customer-text-button"
+            >
+              Retry
+            </button>
+          </AuthNotice>
+        ) : upcoming.length ? (
+          <BookingSummary booking={upcoming[0]} />
+        ) : (
+          <div className="customer-empty-inline">
+            <CalendarDays size={23} />
+            <div>
+              <h3>
+                {user
+                  ? 'No upcoming bookings'
+                  : 'Your bookings, all in one place'}
+              </h3>
+              <p>
+                {user
+                  ? 'Your next confirmed request will appear here.'
+                  : 'Sign in to see scheduled and past assistance.'}
+              </p>
+              {!user && (
+                <Link to="/login">
+                  Sign in <LocateFixed size={13} />
+                </Link>
+              )}
+            </div>
+          </div>
+        )}
+      </section>
+    </>
   );
 }
-

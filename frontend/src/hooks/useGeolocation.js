@@ -21,6 +21,8 @@ export function useGeolocation() {
           resolve({
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
+            accuracy: position.coords.accuracy,
+            updatedAt: new Date(position.timestamp).toISOString(),
             address: 'Current GPS location',
             source: 'GPS active',
           });

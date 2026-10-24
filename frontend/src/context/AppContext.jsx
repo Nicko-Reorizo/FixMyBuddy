@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { initialHistory } from '../data/providers';
-import { getNearbyProviders } from '../services/providerService';
+import { customerService } from '../services/customerService';
 import { AppContext } from './appContextValue';
+import { validateSchedule } from '../utils/vehicleValidation';
+import { defaultProviderFilters, validEstimate } from '../utils/bookingValidation';
 
 const defaultLocation = {
   latitude: null,
@@ -16,7 +17,12 @@ const defaultRequest = {
   issueType: '',
   photoName: '',
   notes: '',
+  destination: '',
+  landmark: '',
+  matchingMode: 'manual',
   searchRadiusKm: 5,
+  vehicleId: '',
+  scheduledAt: null,
 };
 
 const STORAGE_KEY = 'fixmybuddy-state';
@@ -32,67 +38,96 @@ function readStoredState() {
 
 export function AppProvider({ children }) {
   const storedState = readStoredState();
-  const [request, setRequest] = useState(storedState?.request || defaultRequest);
-  const [location, setLocation] = useState(storedState?.location || defaultLocation);
-  const [selectedProviderId, setSelectedProviderId] = useState(storedState?.selectedProviderId || '');
-  const [history, setHistory] = useState(storedState?.history || initialHistory);
+  const [request, setRequest] = useState(
+    { ...defaultRequest, ...storedState?.request, photoName: '' },
+  );
+  const [location, setLocation] = useState(
+    storedState?.location || defaultLocation,
+  );
+  const [selectedProviderId, setSelectedProviderId] = useState(
+    storedState?.selectedProviderId || '',
+  );
+  const [attachments, setAttachments] = useState([]);
+  const [searchProviders, setSearchProviders] = useState([]);
+  const [providerFilters, setProviderFilters] = useState(defaultProviderFilters);
 
   useEffect(() => {
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({
-        request,
-        location,
-        selectedProviderId,
-        history,
-      }),
-    );
-  }, [history, location, request, selectedProviderId]);
+    try {
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({
+          request,
+          location,
+          selectedProviderId,
+        }),
+      );
+    } catch {
+      /* The current request can still be used without browser storage. */
+    }
+  }, [location, request, selectedProviderId]);
 
   const updateRequest = useCallback((nextFields) => {
     setRequest((current) => ({ ...current, ...nextFields }));
+    setSearchProviders([]);
+    setSelectedProviderId('');
   }, []);
 
   const resetRequest = useCallback((serviceType = 'mechanic') => {
     setRequest({ ...defaultRequest, serviceType });
     setSelectedProviderId('');
+    setAttachments([]);
+    setSearchProviders([]);
+    setProviderFilters(defaultProviderFilters);
   }, []);
 
-  const providers = useMemo(() => {
-    return getNearbyProviders({
-      serviceType: request.serviceType,
-      radiusKm: request.searchRadiusKm,
-    });
-  }, [request.searchRadiusKm, request.serviceType]);
+  const providers = searchProviders;
 
   const selectedProvider = useMemo(
-    () => providers.find((provider) => provider.id === selectedProviderId) || null,
+    () =>
+      providers.find((provider) => provider.id === selectedProviderId) || null,
     [providers, selectedProviderId],
   );
 
-  const confirmRequest = () => {
-    if (!selectedProvider || !request.issueType) {
-      return false;
+  const confirmRequest = async (approval) => {
+    if (!validEstimate(selectedProvider?.estimate) || !selectedProvider?.cancellationPolicy?.id || !selectedProvider.cancellationPolicy.text) {
+      throw new Error('A current estimate and cancellation terms are required before booking.');
+    }
+    if (approval?.estimateId !== selectedProvider.estimate.id || approval?.cancellationPolicyId !== selectedProvider.cancellationPolicy.id) {
+      throw new Error('Review and accept the current estimate and cancellation terms.');
+    }
+    if (request.scheduledAt && validateSchedule(request.scheduledAt)) {
+      throw new Error('Your scheduled time has passed. Return home to choose a new time.');
+    }
+    if (attachments.length) {
+      throw new Error('Media upload is not connected yet. Your request has not been submitted.');
+    }
+    if (!selectedProvider || !request.issueType || !request.vehicleId) {
+      throw new Error(
+        'Choose a provider, vehicle, and issue before confirming.',
+      );
     }
 
-    const completedRequest = {
-      id: `history-${Date.now()}`,
-      providerName: selectedProvider.name,
-      serviceType: request.serviceType,
-      issueType: request.issueType,
-      amount: selectedProvider.priceMin,
-      completedAt: 'Just now',
-      rating: selectedProvider.rating,
-    };
-
-    setHistory((items) => [completedRequest, ...items]);
+    const booking = await customerService.createBooking({
+      ...request,
+      location,
+      providerId: selectedProvider.id,
+      estimateId: selectedProvider.estimate.id,
+      estimateVersion: selectedProvider.estimate.version,
+      cancellationPolicyId: selectedProvider.cancellationPolicy.id,
+      paymentMethod: 'provider_qr',
+      repairsApproved: false,
+    });
     resetRequest(request.serviceType);
-    return true;
+    return booking;
   };
 
   const value = {
+    providerFilters,
+    setProviderFilters,
+    attachments,
+    setAttachments,
+    setSearchProviders,
     confirmRequest,
-    history,
     location,
     providers,
     request,
@@ -106,4 +141,3 @@ export function AppProvider({ children }) {
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }
-

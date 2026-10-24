@@ -1,42 +1,12 @@
-import { AlertCircle } from 'lucide-react';
-import { ScreenHeader } from '../components/app/ScreenHeader';
-import { Button } from '../components/ui/Button';
-import { useApp } from '../context/useApp';
-import { serviceOptions } from '../data/serviceOptions';
-
-export function NoProviders() {
-  const { request, updateRequest } = useApp();
-  const selectedService = serviceOptions.find((service) => service.id === request.serviceType) || serviceOptions[0];
-
-  return (
-    <section className="screen flex flex-col">
-      <div className="mobile-column flex min-h-[calc(100vh-3.5rem)] flex-col lg:min-h-0">
-      <ScreenHeader title="No Providers Nearby" backTo="/app" />
-
-      <div className="flex flex-1 flex-col justify-center pb-20 text-center">
-        <div className="mx-auto grid h-24 w-24 place-items-center rounded-full border-2 border-rose-400/60 bg-rose-400/10 text-rose-300">
-          <AlertCircle size={42} />
-        </div>
-
-        <h1 className="mt-7 text-2xl font-extrabold text-white">No providers nearby</h1>
-        <p className="mx-auto mt-4 max-w-sm text-base font-medium leading-7 text-blue-200">
-          {`No verified ${selectedService.shortLabel.toLowerCase()} providers were found within ${request.searchRadiusKm} km. You can expand your search or try again after providers are available.`}
-        </p>
-
-        <div className="mt-16 space-y-3">
-          <Button type="button" onClick={() => updateRequest({ searchRadiusKm: request.searchRadiusKm + 10 })}>
-            Expand to {request.searchRadiusKm + 10} km
-          </Button>
-          <Button to="/providers" variant="muted">
-            Retry Search
-          </Button>
-          <Button to="/" variant="ghost" className="mx-auto text-xs text-slate-500">
-            Back to home
-          </Button>
-        </div>
-      </div>
-      </div>
-    </section>
-  );
+import { CalendarDays, Headphones, Radar, RefreshCw } from 'lucide-react';
+import { Link } from 'react-router-dom';
+export function NoProviders({ radius, onExpand, onRetry, onSchedule }) {
+  return <div className="provider-empty">
+    <span className="provider-empty-symbol"><Radar size={34} /></span><h2>No buddies nearby yet</h2><p>No matching providers were returned within {radius} km. Try a wider search or choose another time.</p>
+    <button type="button" className="provider-option" onClick={onSchedule}><CalendarDays size={20} /><span><strong>Book for later</strong><small>Choose a date and time. Availability still needs confirmation.</small></span></button>
+    <Link className="provider-option" to="/account"><Headphones size={20} /><span><strong>Need a hand?</strong><small>Check your account and contact options.</small></span></Link>
+    <button type="button" className="auth-primary" onClick={onExpand} disabled={radius >= 30}><Radar size={20} />{radius >= 30 ? 'Maximum search radius reached' : `Expand search to ${Math.min(30, Math.max(15, radius + 10))} km`}</button>
+    <button type="button" className="auth-secondary" onClick={onRetry}><RefreshCw size={18} />Try again</button>
+  </div>;
 }
 

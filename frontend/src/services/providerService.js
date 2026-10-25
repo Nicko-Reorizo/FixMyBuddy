@@ -1,4 +1,5 @@
 import { isProviderRecord } from '../utils/bookingValidation';
+import { networkFetch } from '../utils/networkFetch';
 const baseUrl = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
 export const isProviderApiConfigured = Boolean(baseUrl);
 
@@ -10,7 +11,7 @@ async function providerRequest(path, body, signal) {
   if (signal?.aborted) controller.abort();
   const timeout = setTimeout(abort, 15000);
   try {
-    const response = await fetch(`${baseUrl}${path}`, {
+    const response = await networkFetch(`${baseUrl}${path}`, {
       method: body ? 'POST' : 'GET', credentials: 'include', signal: controller.signal,
       headers: { Accept: 'application/json', ...(body ? { 'Content-Type': 'application/json' } : {}) },
       ...(body ? { body: JSON.stringify(body) } : {}),

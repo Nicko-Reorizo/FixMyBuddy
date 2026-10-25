@@ -21,6 +21,8 @@ The location screen uses browser geolocation when permission is granted. Provide
 
 ## Scripts
 
+Connection feedback: browser offline status shows an animated Waiting for internet banner. Failed API connections show a connection-error notice; the browser online event asks the customer to retry. Only an actual HTTP response clears the connection-error state automatically. No booking, payment, message or upload is automatically resent. Browser network availability does not guarantee internet/API reachability; reduced-motion preferences disable the spinner.
+
 - `npm run dev` starts the development server.
 - `npm run build` creates a production build.
 - `npm run preview` previews the production build locally.
@@ -30,6 +32,8 @@ The location screen uses browser geolocation when permission is granted. Provide
 On Windows PowerShell, use `npm.cmd install` and `npm.cmd run dev` if execution policy blocks npm.ps1.
 
 ## Provider Search and Booking
+
+Account settings and the Help Center are available from `/account` and `/help`. English/Filipino selection is under `/settings/language`. Profile changes, chat, disputes, sharing and logout use authenticated API contracts documented in `ACCOUNT_API.md`; missing backend services never produce simulated successes.
 
 Customer requests continue to `/providers`, `/provider-filters`, a provider profile and `/confirm-request`. Data comes exclusively from `VITE_API_BASE_URL`; unconfigured search is explicitly unavailable. No provider records, prices, reviews, QR codes or bookings are seeded into the app. See `CUSTOMER_API.md` for the search, quote, booking, repair approval and payment-report contracts.
 

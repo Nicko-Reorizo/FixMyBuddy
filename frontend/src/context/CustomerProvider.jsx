@@ -159,6 +159,13 @@ function CustomerStore({ owner, user, children }) {
   }
 
   const refreshData = useCallback(() => setRefresh((value) => value + 1), []);
+  async function markUpdatesRead(ids) {
+    if (!remote) throw new Error('Notifications are not connected. Please sign in when the backend is available.');
+    const confirmed = await customerService.markUpdatesRead(ids);
+    const accepted = confirmed.filter(id => ids.includes(id));
+    setUpdates(current => current.map(item => accepted.includes(item.id) ? { ...item, read: true } : item));
+    return accepted;
+  }
   return (
     <CustomerContext.Provider
       value={{
@@ -174,6 +181,7 @@ function CustomerStore({ owner, user, children }) {
         bookingStatus,
         updatesStatus,
         refreshData,
+        markUpdatesRead,
         localGarage: !remote,
       }}
     >

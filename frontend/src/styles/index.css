@@ -3,6 +3,204 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+  .buddy-network { @apply sticky top-0 z-[90] border-b border-[#ffda45]/40 bg-[#172436] px-4 py-3 text-[#f4f6fb]; }
+  .buddy-network-inner { @apply mx-auto flex w-full max-w-[488px] items-center gap-3; }
+  .buddy-network-inner > svg { @apply shrink-0 text-[#ffda45]; }
+  .buddy-network-inner > div { @apply min-w-0 flex-1; }
+  .buddy-network strong { @apply block text-sm font-semibold leading-5; }
+  .buddy-network span { @apply mt-1 block text-xs leading-5 text-[#b1bed0]; }
+  .buddy-network button { @apply grid h-11 w-11 shrink-0 place-items-center rounded-lg text-[#b1bed0] hover:bg-white/5; }
+  .buddy-network-spin { animation: buddy-loader-spin 1.2s linear infinite; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .buddy-network-spin { animation: none; }
+}
+
+
+@keyframes buddy-loader-spin { to { transform: rotate(360deg); } }
+@keyframes buddy-loader-pulse { 0%,100% { opacity: .65; } 50% { opacity: 1; } }
+@keyframes buddy-route-progress {
+  0% { transform: scaleX(0); opacity: 1; }
+  65% { transform: scaleX(.85); opacity: 1; }
+  100% { transform: scaleX(1); opacity: 0; }
+}
+@layer components {
+  .buddy-loader { @apply flex min-h-36 flex-col items-center justify-center gap-3 p-6 text-center text-xs leading-5 text-[#b1bed0]; }
+  .buddy-loader-symbol { @apply relative grid h-16 w-16 shrink-0 place-items-center text-[#ffda45]; }
+  .buddy-loader-ring { @apply absolute inset-0; animation: buddy-loader-spin 1s linear infinite; }
+  .buddy-loader-wrench { animation: buddy-loader-pulse 1.4s ease-in-out infinite; }
+  .buddy-splash { @apply grid min-h-[100svh] place-items-center; }
+  .buddy-splash strong { @apply block text-center text-lg font-semibold text-white; }
+  .buddy-route-progress { @apply pointer-events-none fixed inset-x-0 top-0 z-[100] h-[3px] bg-[#ffda45]; transform-origin: left; animation: buddy-route-progress 650ms ease-out both; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .buddy-loader-ring, .buddy-loader-wrench { animation: none; }
+  .buddy-route-progress { display: none; }
+}
+
+
+@layer components {
+  .towing-condition { @apply gap-4; }
+  .towing-condition legend { @apply mb-3 text-sm font-semibold; }
+  .towing-route, .towing-journey { @apply my-4 flex min-w-0 flex-col gap-4 border-y border-[#34435b] py-4; animation: buddy-screen 350ms ease-out both; }
+  .towing-route h2, .towing-journey h2 { @apply m-0 flex items-center gap-2 text-base font-semibold leading-6; }
+  .towing-journey h3 { @apply m-0 text-sm font-semibold; }
+  .towing-route dl, .towing-facts { @apply m-0 flex flex-col gap-3 text-xs; }
+  .towing-route dl > div, .towing-facts > div { @apply flex flex-wrap items-start justify-between gap-2; }
+  .towing-route dt, .towing-facts dt { @apply text-[#b1bed0]; }
+  .towing-route dd, .towing-facts dd { @apply m-0 min-w-0 text-right; overflow-wrap: anywhere; }
+  .towing-photo { @apply h-32 w-full rounded-lg object-cover; }
+}
+
+@layer components {
+  .after-service { @apply mt-6 flex min-w-0 flex-col gap-4 border-t border-[#34435b] pt-5; animation: buddy-screen 350ms ease-out both; }
+  .after-service h2 { @apply m-0 flex items-center gap-2 text-base font-semibold leading-6; }
+  .service-stars { @apply m-0 min-w-0 border-0 p-0; }
+  .service-stars legend { @apply mb-2 text-sm text-[#b1bed0]; }
+  .service-stars > div { @apply grid grid-cols-5 gap-1; }
+  .service-stars label { @apply relative flex h-12 cursor-pointer items-center justify-center rounded-lg text-[#ffda45]; }
+  .service-stars input { @apply absolute inset-0 h-full w-full cursor-pointer opacity-0; }
+  .service-stars label:focus-within { @apply outline outline-2 outline-offset-2 outline-[#ffda45]; }
+  .service-stars svg { transition: transform 160ms ease-out; }
+  .service-stars label:active svg { transform: scale(1.12); }
+  .service-warranties { @apply flex flex-col gap-3; }
+  .service-warranties article { @apply rounded-lg border border-[#34435b] bg-[#1c293d] p-3.5; }
+  .service-warranties header { @apply flex flex-wrap items-start justify-between gap-2; }
+  .service-warranties h3 { @apply m-0 min-w-0 text-sm font-semibold; overflow-wrap: anywhere; }
+  .service-warranties header > span { @apply text-xs text-[#ffda45]; }
+  .service-warranties dl { @apply my-3 flex flex-col gap-2 text-xs; }
+  .service-warranties dl > div { @apply flex flex-wrap justify-between gap-2; }
+  .service-warranties dd { @apply m-0; }
+  .service-warranties dt, .service-warranties p { @apply text-[#b1bed0]; }
+  .service-warranties summary { @apply min-h-11 cursor-pointer py-3 text-xs font-semibold text-[#ffda45]; }
+  .service-warranties p { @apply my-2 whitespace-pre-wrap text-xs leading-6; overflow-wrap: anywhere; }
+}
+@layer components {
+  .quote-review, .quote-decision { @apply flex min-w-0 flex-col gap-4; }
+  .quote-review { animation: buddy-screen 350ms ease-out both; }
+  .quote-review h3 { @apply m-0 text-sm font-semibold leading-6; }
+  .quote-stage { @apply m-0 text-xs leading-5 text-[#ffda45]; }
+  .quote-total { @apply m-0 border-y border-[#ffda45]/40 bg-[#ffda45]/10 px-3 py-4 text-xl font-bold leading-7 text-[#ffda45]; overflow-wrap: anywhere; }
+  .quote-comparison { @apply m-0 flex flex-col gap-3 border-y border-[#34435b] py-4; }
+  .quote-comparison > div { @apply flex flex-wrap justify-between gap-2 text-xs leading-5; }
+  .quote-comparison dt { @apply min-w-0 text-[#b1bed0]; }
+  .quote-comparison dd { @apply m-0 font-semibold text-[#ffda45]; }
+}
+
+@layer components {
+  .account-sign-in { @apply mb-5; }
+  .account-settings-group { @apply my-0 mb-5 list-none divide-y divide-[#34435b] border-y border-[#34435b] p-0; }
+  .account-settings-group a { @apply flex min-h-[76px] items-center gap-3 py-3; }
+  .account-settings-group a > svg:first-child { @apply shrink-0 text-[#ffda45]; }
+  .account-settings-group a > svg:last-child { @apply shrink-0 text-[#b1bed0]; }
+  .account-settings-group a > span { @apply min-w-0 flex-1; }
+  .account-settings-group strong { @apply block text-sm font-semibold; }
+  .account-settings-group small { @apply mt-1 block text-xs leading-5 text-[#b1bed0]; overflow-wrap: anywhere; }
+  .account-settings-group a { transition: color 180ms, background-color 180ms; }
+  .account-settings-group a:hover { @apply text-[#ffda45]; }
+  .account-help-link { @apply mb-4 flex min-h-12 items-center gap-3 text-sm text-[#b1bed0]; }
+  .account-help-link svg, .account-help-link strong { @apply shrink-0 text-[#ffda45]; }
+  .account-help-link span { @apply min-w-0 flex-1; }
+  .account-form { @apply mt-5; }
+  .account-readonly { @apply m-0 flex flex-col gap-4 border-y border-[#34435b] py-4; }
+  .account-readonly div { @apply flex flex-col gap-1; }
+  .account-readonly dt { @apply text-xs text-[#b1bed0]; }
+  .account-readonly dd { @apply m-0 text-sm; overflow-wrap: anywhere; }
+  .settings-section { @apply flex flex-col gap-4; animation: buddy-screen 350ms ease-out both; }
+  .settings-section > svg { @apply text-[#ffda45]; }
+  .settings-section h2 { @apply m-0 text-lg font-semibold leading-7; }
+  .settings-section p { @apply m-0 text-sm leading-6 text-[#b1bed0]; }
+  .settings-languages { @apply m-0 flex flex-col gap-3 border-0 p-0; }
+  .settings-languages legend { @apply mb-4 text-sm font-semibold; }
+  .settings-languages label { @apply flex min-h-14 cursor-pointer items-center gap-3 rounded-lg border border-[#34435b] bg-[#1c293d] p-3 text-sm; }
+  .settings-languages label:has(input:checked) { @apply border-[#ffda45] text-[#ffda45]; }
+  .settings-languages input { @apply h-5 w-5 accent-[#ffda45]; }
+  .help-actions { @apply mb-4 flex flex-col gap-3; }
+  .help-topics { @apply mt-5 flex flex-col; }
+  .help-topics h2, .dispute-list h2, .booking-sharing h2 { @apply m-0 mb-3 text-base font-semibold; }
+  .help-topics details { @apply border-b border-[#34435b]; }
+  .help-topics summary { @apply flex min-h-14 cursor-pointer list-none items-center gap-3 py-3 text-sm; }
+  .help-topics summary::-webkit-details-marker { display: none; }
+  .help-topics summary > span { @apply min-w-0 flex-1; }
+  .help-topics summary > svg { @apply shrink-0 text-[#ffda45]; }
+  .help-topics details[open] summary > svg:last-child { transform: rotate(90deg); }
+  .help-topics details p { @apply mb-4 mt-0 text-sm leading-6 text-[#b1bed0]; animation: buddy-screen 250ms ease-out both; }
+  .help-concern-link { @apply mt-5 flex min-h-20 items-center gap-3 rounded-lg border border-[#34435b] bg-[#1c293d] p-3.5; }
+  .help-concern-link > span { @apply min-w-0 flex-1; }
+  .help-concern-link svg { @apply shrink-0 text-[#ffda45]; }
+  .help-concern-link strong { @apply block text-sm; }
+  .help-concern-link small { @apply mt-1 block text-xs leading-5 text-[#b1bed0]; }
+  .help-case-link { @apply mt-3 flex flex-col gap-2 rounded-lg border border-[#34435b] bg-[#1c293d] p-3.5 text-sm; overflow-wrap: anywhere; }
+  .help-case-link span { @apply text-xs leading-5 text-[#b1bed0]; }
+  .account-inline-action { @apply mb-3 inline-flex min-h-11 items-center gap-2; }
+  .support-messages { @apply my-4 flex max-h-[55svh] min-h-32 flex-col gap-3 overflow-y-auto py-2; }
+  .support-messages article { @apply max-w-[90%] rounded-lg border border-[#34435b] bg-[#1c293d] p-3; animation: buddy-screen 250ms ease-out both; }
+  .support-messages article.from-customer { @apply ml-auto border-[#ffda45]/40 bg-[#ffda45]/10; }
+  .support-messages strong { @apply text-xs text-[#ffda45]; }
+  .support-messages p { @apply my-2 whitespace-pre-wrap text-sm leading-6; overflow-wrap: anywhere; }
+  .support-messages time { @apply block text-[10px] text-[#b1bed0]; }
+  .support-composer { @apply mt-4; }
+  .dispute-form { @apply border-y border-[#34435b] py-4; }
+  .evidence-picker h3 { @apply m-0 mb-3 flex items-center justify-between text-sm font-semibold; }
+  .evidence-picker small { @apply text-xs font-normal text-[#b1bed0]; }
+  .evidence-picker .auth-hint { @apply mt-3; }
+  .dispute-list { @apply mt-7; }
+  .dispute-list article { @apply mb-3 rounded-lg border border-[#34435b] bg-[#1c293d] p-3.5; animation: buddy-screen 350ms ease-out both; }
+  .dispute-list h3 { @apply m-0 text-sm font-semibold; overflow-wrap: anywhere; }
+  .dispute-list article p { @apply my-2 text-xs leading-6 text-[#b1bed0]; overflow-wrap: anywhere; }
+  .dispute-list time { @apply text-[10px] text-[#b1bed0]; }
+  .booking-sharing { @apply my-5 flex flex-col gap-3 border-y border-[#34435b] py-4; }
+  .booking-sharing h2 { @apply mb-0 flex items-center gap-2; }
+  .booking-sharing h2 svg { @apply text-[#ffda45]; }
+}
+
+
+@layer components {
+  .history-filters { @apply mb-4; }
+  .history-refresh { @apply mb-3 inline-flex min-h-11 items-center gap-2; }
+  .history-status-filter { @apply mb-5 flex flex-wrap items-center justify-between gap-2 text-xs text-[#b1bed0]; }
+  .history-status-filter select { @apply min-h-11 max-w-full rounded-lg border border-[#34435b] bg-[#1c293d] px-3 text-xs text-white; }
+  .history-groups { @apply flex flex-col gap-6; animation: buddy-screen 350ms ease-out both; }
+  .history-groups h2 { @apply mb-3 mt-0 text-base font-semibold; }
+  .history-groups .customer-history-list > a, .notification-list article, .reminder-item { animation: buddy-screen 350ms ease-out backwards; }
+  .history-groups .customer-history-list > :nth-child(2), .notification-list > :nth-child(2), .reminder-list > :nth-child(2) { animation-delay: 70ms; }
+  .history-booking p { @apply flex-wrap; overflow-wrap: anywhere; }
+  .history-booking p > span { @apply min-w-0; }
+  .history-booking .history-amount { @apply ml-auto text-right text-xs font-semibold text-[#ffda45]; }
+  .history-manage { @apply ml-auto inline-flex items-center gap-1 text-[#ffda45]; }
+  .history-notice { @apply my-3 flex flex-col gap-3 rounded-lg border border-[#34435b] bg-[#1c293d] p-4 text-sm leading-6 text-[#b1bed0]; }
+  .history-notice p { @apply m-0; }
+  .history-empty-copy { @apply my-3 text-sm leading-6 text-[#b1bed0]; }
+  .booking-actions { @apply mt-4 flex flex-col gap-3; }
+  .history-action-row { @apply grid grid-cols-1 gap-2 sm:grid-cols-2; }
+  .history-action-row button { @apply px-2 text-xs; }
+  .history-dialog { @apply w-[calc(100%-2rem)] max-w-[460px]; }
+  .history-dialog > .auth-secondary { @apply mt-3; }
+  .receipt-preview { @apply mb-3 h-[50svh] w-full rounded-lg border border-[#34435b] bg-white; }
+  .updates-reminders { @apply mb-7; }
+  .updates-reminders .customer-text-button, .updates-notifications .customer-text-button { @apply inline-flex min-h-11 items-center gap-1.5; }
+  .reminder-form { @apply my-4 border-y border-[#34435b] py-4; animation: buddy-screen 350ms ease-out both; }
+  .reminder-form h3 { @apply m-0 text-base font-semibold; }
+  .reminder-list, .notification-list { @apply mt-3 flex flex-col gap-3; }
+  .reminder-item, .notification-list article { @apply min-w-0 rounded-lg border border-[#34435b] bg-[#1c293d] p-3.5; }
+  .reminder-item header, .notification-list header { @apply flex flex-wrap items-start gap-2; }
+  .reminder-item header > svg, .notification-list header > svg { @apply mt-0.5 shrink-0 text-[#ffda45]; }
+  .reminder-item h3, .notification-list h3 { @apply m-0 min-w-0 flex-1 text-sm font-medium leading-5; overflow-wrap: anywhere; }
+  .reminder-item header > span { @apply ml-auto text-right text-xs leading-5 text-[#b1bed0]; }
+  .reminder-item header > span.is-due { @apply text-[#ffda45]; }
+  .reminder-item p, .notification-list p { @apply mb-0 mt-2 text-xs leading-6 text-[#b1bed0]; overflow-wrap: anywhere; }
+  .reminder-actions, .notification-actions { @apply mt-2 flex flex-wrap items-center gap-2; }
+  .reminder-actions > button:first-child { @apply mr-auto; }
+  .history-icon { @apply grid h-11 w-11 shrink-0 place-items-center rounded-lg text-[#b1bed0] transition hover:bg-[#24364d] hover:text-[#ffda45]; }
+  .history-checkbox { @apply mt-4 flex min-h-11 items-center gap-2 text-xs text-[#b1bed0]; }
+  .history-checkbox input { @apply h-5 w-5 accent-[#ffda45]; }
+  .notification-list article.is-unread { @apply border-[#ffda45]/50; }
+  .notification-list time { @apply ml-auto text-right text-[10px] leading-5 text-[#b1bed0]; }
+  .notification-dot { @apply mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[#ffda45]; }
+}
+
+
 @keyframes buddy-screen {
   from { opacity: 0; transform: translateY(18px); }
   to { opacity: 1; transform: translateY(0); }

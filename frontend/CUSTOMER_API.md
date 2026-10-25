@@ -1,5 +1,45 @@
 # Customer home and vehicles
 
+## Towing Route, Tracking and Handover
+
+Towing requests additionally require destination and towingCondition `{ starts, rolls, collision }`, each an explicit yes/no/unknown choice. Values remain language-independent. GPS/manual pickup stays in location; typed destinations are not assigned fictional coordinates. Provider quote responses must include towingQuote `{ routeId, version, distanceKm, pickupAddress, destinationAddress, equipment }` alongside the actual itemized estimate and terms. Booking creation sends towingRouteId/towingRouteVersion. Validate the quote's route, pickup, destination, vehicle/condition, schedule, equipment capability, prices and version atomically on the backend. No client distance/fee or cancellation charge is invented.
+
+GET booking records may include towing `{ status, destinationAddress, distanceKm?, etaMinutes?, equipment?, provider: { name, phone?, chatEnabled?, position?: { latitude, longitude, updatedAt? } }, pickupPhotos?: [{ id, url }], arrivalPhotos?: [{ id, url }], canConfirmHandover, handover?: { status, requiresPin?, condition?, ... } }`. Only actual non-null valid coordinates produce an OpenStreetMap point, labeled as last reported, not a simulated route or vehicle movement. Refresh loads current backend records. Contact actions use only the assigned provider's supplied phone/chat capability. Photo URLs must be authorized HTTPS records; no sample pictures are inserted.
+
+`GET/POST /customers/me/bookings/:id/towing/messages` provides assigned-provider chat. GET returns `{ messages: [{ id, body, sender: 'customer'|'provider' }] }`; POST accepts body/clientId, returns `{ message }` for an acknowledged customer message. Authenticate booking ownership and assignment, derive sender server-side, rate-limit, deduplicate clientId and prevent cross-booking conversation access. Refresh retrieves actual replies, never automatic fake responses.
+
+Handover is exposed only for towing.status at_destination plus canConfirmHandover true, not cancelled/rejected or already confirmed. It requires explicit vehicleReceived/keysReceived, condition no_new_damage or damage_reported, and at least 10 characters of damageNotes when damage is reported. Missing keys/vehicle should be resolved with the provider/support instead of checking false statements. Optional arrival evidence reuses the 10-file photo/video limits and previews. If requiresPin is true, enter the backend-issued PIN; no PIN is generated or persisted in browser storage.
+
+`POST /customers/me/bookings/:id/towing/handover` accepts multipart details JSON `{ condition, vehicleReceived, keysReceived, damageNotes, pin?, bookingVersion, clientId }` plus repeated evidence File fields. Return `{ handover: { id, status: 'confirmed', condition, damageNotes?, keysReceived: true, vehicleReceived: true } }`. Damage reports must be preserved in the acknowledgement. Backend must enforce ownership/assignment, arrival state, version, PIN expiry/rate limits, successful-request idempotency and private evidence storage/content validation. Never log or expose the PIN; revoke it after success. GET booking records must reflect the confirmed handover and evidence links. Handover does not imply payment verification or automatically complete the service in the client. Unverified towing payment reporting stays blocked until handover is confirmed; existing server-verified receipts remain viewable.
+
+## Estimated Repair Price and Revisions
+
+Focused bookings show optional initialEstimate (not a final quote), approvedQuote, pendingRevision, revisionStatus, repairEstimate/repairApprovalStatus, and declinePayableEstimate. All estimates use the existing PHP itemized quote schema, including ID and version. No call-out, diagnosis, repair, parts, fee or declined-repair amount is supplied by the frontend. Approved/historical quotes remain viewable after expiry; pending quotes must still be current to accept a decision.
+
+A pendingRevision requires baseQuoteId/baseQuoteVersion matching approvedQuote. `POST /customers/me/bookings/:id/quote-decision` accepts quoteId, quoteVersion, decision (approve/reject), approvedQuoteId, approvedQuoteVersion and bookingVersion. Return `{ booking, decision: { quoteId, quoteVersion, decision } }`. For revisions, booking.revisionStatus must become approved/rejected; for first repair quotes use booking.repairApprovalStatus. Approval must return that exact approvedQuote; rejection must return the unchanged previously approved quote (or no approved quote for an initial rejection). No client success is shown without a consistent acknowledgement. An initial rejection's payable charges must come from declinePayableEstimate, never a frontend fee assumption.
+
+The backend must authenticate ownership, atomically check quote/base versions, expiry and booking state, deduplicate retries, record consent/decision history, and prevent unapproved work or charges. A revised total is compared in centavos for display only; the client does not set authoritative charges. Rejection does not cancel or increase the original approved scope.
+
+An optional canRequestInspection flag exposes `POST /customers/me/bookings/:id/inspection-request` with version. Return `{ booking: { id, inspectionStatus: 'requested', ... } }` only after saving the real request. Server must enforce state and idempotency. No automatic inspection-completed state is generated.
+
+Service completed, QR payment reported/pending verification, verified payment and receipt issuance remain distinct. Existing provider-supplied GCash QR flow is unchanged; no Maya/card/cash simulation, payment attempt generator or invented success/failure screen is added.
+
+## History and Updates
+
+History groups coming-up, completed and cancelled/rejected bookings, with service and status filters. Reference numbers, providers, timestamps, amounts and payment verification come only from server records. A completed service is not assumed paid. Centavos are preserved.
+
+Booking management requires an explicitly allowed pre-dispatch status (requested, pending, confirmed, accepted or scheduled), no dispatchedAt, and canCancel/canReschedule true. The actual cancellationPolicy `{ id, text }` must exist and be accepted. `POST /customers/me/bookings/:id/cancel` takes `{ version?, cancellationPolicyId }` and returns `{ booking }` with status cancelled. `/reschedule` additionally takes scheduledAt (future ISO timestamp) and returns the authoritative booking with its new scheduledAt. The server must check authorization, ownership, current dispatch state, quote/policy version, slot availability and fees atomically. Client visibility is not authorization. Conflict responses must not be represented as success.
+
+Rebook starts a fresh draft, selects the old vehicle only if it is still in the garage, and preserves only the service and issue choice. It clears old pickup coordinates, schedule, provider, prices, approvals and media. Missing vehicles require selection again. Towing destination and pickup must be entered/confirmed again.
+
+Receipts require both payment.status verified and receiptAvailable true. `GET /customers/me/bookings/:id/receipt` must enforce these server-side and return an authenticated application/pdf response. The customer can preview/open/download the actual PDF. No receipt is generated from frontend totals. Blob URLs are revoked when closed/unmounted.
+
+Updates supports `POST /customers/me/updates/read` with `{ ids: string[] }`, returning `{ readIds: string[] }`. Only IDs explicitly acknowledged by the server are marked read; concurrent new notifications stay unread. Notifications may include type, createdAt, read/readAt and bookingId. Times display in Asia/Manila; links open the actual booking. Payment/warranty messages must be derived from authoritative provider/payment/warranty events, not fabricated by the client. Manual refresh is available; push delivery is not simulated.
+
+Maintenance reminders use `GET/POST /customers/me/reminders`, `PATCH/DELETE /customers/me/reminders/:id`. GET returns `{ reminders }`, writes `{ reminder }`, deletion may return 204. Schema: `{ id, title, vehicleId, dueDate?, targetMileage?, currentMileage?, notes?, completedAt? }`. dueDate is YYYY-MM-DD; mileage is a nonnegative number or null. At least a date or target mileage is required. Completion uses completedAt and reopening null. The server must validate vehicle ownership and reminder ownership. Deletion has an explicit confirmation dialog.
+
+Without an authenticated configured API, user-created reminders are labeled device-only, stored under fixmybuddy-reminders:<customer-id-or-guest>, and never presented as push notifications. Nothing is seeded. Signed-in configured accounts use API records instead of local reminder records; guest data is not silently uploaded. Due status is derived from the entered date (Asia/Manila) and/or entered odometer reading; the frontend does not track vehicle mileage automatically.
+
 React + Tailwind, using the approved customer branding and motion. The approved
 landing and authentication layouts remain the entry points.
 

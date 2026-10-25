@@ -1,14 +1,9 @@
+import { tr } from "../../i18n/translations";
 import { useState } from 'react';
 import { Mail } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import {
-  AuthField,
-  AuthHeading,
-  AuthNotice,
-  AuthSubmit,
-} from '../../components/auth/AuthControls';
+import { AuthField, AuthHeading, AuthNotice, AuthSubmit } from '../../components/auth/AuthControls';
 import { authService } from '../../services/authService';
-
 export function ForgotPassword() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -28,40 +23,19 @@ export function ForgotPassword() {
       setBusy(false);
     }
   }
-  return (
-    <div className="auth-page">
-      <AuthHeading title="Let's get you back in.">
-        Enter your account email to request a password reset link.
-      </AuthHeading>
-      {sent ? (
-        <>
-          <AuthNotice>
-            If an account exists for that email, you will receive reset
-            instructions. Check your inbox and spam folder.
-          </AuthNotice>
+  return <div className="auth-page">
+      <AuthHeading title={tr("Let's get you back in.")}>{tr("Enter your account email to request a password reset link.")}</AuthHeading>
+      {sent ? <>
+          <AuthNotice>{tr("If an account exists for that email, you will receive reset instructions. Check your inbox and spam folder.")}</AuthNotice>
           <div className="auth-actions">
-            <Link className="auth-primary" to="/login">
-              Back to sign in
-            </Link>
+            <Link className="auth-primary" to="/login">{tr("Back to sign in")}</Link>
           </div>
-        </>
-      ) : (
-        <form className="auth-form" onSubmit={submit}>
-          <AuthField
-            id="reset-email"
-            name="email"
-            label="Email address"
-            type="email"
-            autoComplete="email"
-            required
-            icon={Mail}
-          />
-          {error && <AuthNotice error>{error}</AuthNotice>}
+        </> : <form className="auth-form" onSubmit={submit}>
+          <AuthField id="reset-email" name="email" label={tr("Email address")} type="email" autoComplete="email" required icon={Mail} />
+          {error && <AuthNotice error>{tr(error)}</AuthNotice>}
           <div className="auth-actions">
-            <AuthSubmit busy={busy}>Send reset link</AuthSubmit>
+            <AuthSubmit busy={busy}>{tr("Send reset link")}</AuthSubmit>
           </div>
-        </form>
-      )}
-    </div>
-  );
+        </form>}
+    </div>;
 }

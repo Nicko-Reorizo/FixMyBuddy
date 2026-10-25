@@ -1,7 +1,7 @@
+import { tr, trTemplate } from "../../i18n/translations";
 import { useEffect } from 'react';
 import { ArrowLeft, ArrowUpRight, Wrench } from 'lucide-react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
-
 const steps = ['/signup', '/verify', '/permissions', '/profile'];
 const titles = {
   '/start': 'Welcome',
@@ -10,23 +10,22 @@ const titles = {
   '/verify': 'Verify number',
   '/permissions': 'Your preferences',
   '/profile': 'Safety contact',
-  '/forgot-password': 'Reset password',
+  '/forgot-password': 'Reset password'
 };
-
 export function AuthLayout() {
-  const { pathname } = useLocation();
+  const {
+    pathname
+  } = useLocation();
   const step = steps.indexOf(pathname);
-  const backTo =
-    {
-      '/start': '/',
-      '/login': '/',
-      '/signup': '/',
-      '/verify': '/login',
-      '/permissions': '/app',
-      '/profile': '/permissions',
-      '/forgot-password': '/login',
-    }[pathname] || '/';
-
+  const backTo = {
+    '/start': '/',
+    '/login': '/',
+    '/signup': '/',
+    '/verify': '/login',
+    '/permissions': '/app',
+    '/profile': '/permissions',
+    '/forgot-password': '/login'
+  }[pathname] || '/';
   useEffect(() => {
     document.title = `${titles[pathname] || 'Account'} | FixMyBuddy`;
     window.scrollTo(0, 0);
@@ -34,24 +33,17 @@ export function AuthLayout() {
       document.title = 'FixMyBuddy';
     };
   }, [pathname]);
-
-  return (
-    <div className="auth-root">
-      <a href="#auth-main" className="auth-skip">
-        Skip to form
-      </a>
+  return <div className="auth-root">
+      <a href="#auth-main" className="auth-skip">{tr("Skip to form")}</a>
       <header className="auth-nav">
-        <Link to="/" className="auth-brand" aria-label="FixMyBuddy home">
+        <Link to="/" className="auth-brand" aria-label={tr("FixMyBuddy home")}>
           <span className="auth-brand-icon">
             <Wrench size={21} />
           </span>
-          <span>
-            FixMyBuddy
-            <span className="auth-brand-caption">YOUR ROADSIDE BUDDY</span>
+          <span>{tr("FixMyBuddy")}<span className="auth-brand-caption">{tr("YOUR ROADSIDE BUDDY")}</span>
           </span>
         </Link>
-        <Link to="/app" className="auth-browse">
-          Browse first <ArrowUpRight size={16} />
+        <Link to="/app" className="auth-browse">{tr("Browse first")}<ArrowUpRight size={16} />
         </Link>
       </header>
       <div className="auth-workspace">
@@ -59,34 +51,22 @@ export function AuthLayout() {
           <div className="auth-form-wrap" key={pathname}>
             <div className="auth-form-top">
               <Link to={backTo} className="auth-back">
-                <ArrowLeft size={18} /> Back
-              </Link>
-              <span className="auth-customer-tag">CUSTOMER</span>
+                <ArrowLeft size={18} />{tr("Back")}</Link>
+              <span className="auth-customer-tag">{tr("CUSTOMER")}</span>
             </div>
-            {step >= 0 && (
-              <div
-                className="auth-progress"
-                aria-label={`Onboarding step ${step + 1} of 4`}
-              >
+            {step >= 0 && <div className="auth-progress" aria-label={trTemplate(["Onboarding step ", " of 4"], [step + 1])}>
                 <div className="auth-progress-bars">
-                  {steps.map((path, index) => (
-                    <span
-                      key={path}
-                      className={index <= step ? 'is-current' : ''}
-                    />
-                  ))}
+                  {steps.map((path, index) => <span key={path} className={index <= step ? 'is-current' : ''} />)}
                 </div>
                 <span>{step + 1} / 4</span>
-              </div>
-            )}
+              </div>}
             <Outlet />
           </div>
           <footer className="auth-footer">
-            <Wrench size={13} /> FixMyBuddy{' '}
-            <span>Here for your next move.</span>
+            <Wrench size={13} />{tr("FixMyBuddy")} {' '}
+            <span>{tr("Here for your next move.")}</span>
           </footer>
         </main>
       </div>
-    </div>
-  );
+    </div>;
 }

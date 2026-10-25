@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Bell, History, House, UserRound, Wrench } from 'lucide-react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
+import { useLocale } from '../../context/useLocale';
 
 const navigation = [
   { to: '/app', label: 'Home', icon: House },
@@ -10,6 +11,7 @@ const navigation = [
 ];
 
 export function CustomerLayout() {
+  const { t, language } = useLocale();
   const { pathname } = useLocation();
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -23,12 +25,12 @@ export function CustomerLayout() {
         '/location': 'Pickup location',
       }[pathname] || 'Customer';
     document.title = `${title} | FixMyBuddy`;
-  }, [pathname]);
+  }, [pathname, language]);
 
   return (
     <div className="auth-root customer-root">
       <a href="#customer-main" className="auth-skip">
-        Skip to content
+        {t('Skip to content','Pumunta sa nilalaman')}
       </a>
       <div className="customer-shell">
         <header className="customer-header">
@@ -61,13 +63,13 @@ export function CustomerLayout() {
               className={({ isActive }) =>
                 isActive ||
                 (to === '/account' &&
-                  ['/vehicles', '/location'].includes(pathname))
+                  (['/vehicles', '/location'].includes(pathname) || pathname.startsWith('/account/') || pathname.startsWith('/settings/') || pathname.startsWith('/help')))
                   ? 'is-active'
                   : ''
               }
             >
               <Icon size={22} />
-              <span>{label}</span>
+              <span>{t(label, { Home: 'Home', History: 'Kasaysayan', Updates: 'Mga abiso', Account: 'Account' }[label])}</span>
             </NavLink>
           ))}
         </nav>

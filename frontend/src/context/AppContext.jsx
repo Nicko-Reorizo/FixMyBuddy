@@ -4,6 +4,7 @@ import { AppContext } from './appContextValue';
 import { validateSchedule } from '../utils/vehicleValidation';
 import { defaultProviderFilters, validEstimate } from '../utils/bookingValidation';
 import { validTowingCondition, validTowingQuote } from '../utils/towingValidation';
+import { validateTowingDestination } from '../utils/towingDestination';
 
 const defaultLocation = {
   latitude: null,
@@ -19,6 +20,8 @@ const defaultRequest = {
   photoName: '',
   notes: '',
   destination: '',
+  destinationMode: 'manual',
+  destinationShop: null,
   towingCondition: {},
   landmark: '',
   matchingMode: 'manual',
@@ -91,6 +94,7 @@ export function AppProvider({ children }) {
   );
 
   const confirmRequest = async (approval) => {
+    if (request.serviceType === 'towing' && validateTowingDestination(request, location)) throw new Error(validateTowingDestination(request, location));
     if (request.serviceType === 'towing' && (!validTowingCondition(request.towingCondition) || !validTowingQuote(selectedProvider?.towingQuote) || request.destination.trim().length < 5)) {
       throw new Error('Confirm your towing destination, vehicle condition and provider route before booking.');
     }

@@ -5,6 +5,7 @@ import { RequestFrame } from '../components/app/RequestFrame';
 import { RequestVehicle } from '../components/app/RequestVehicle';
 import { useApp } from '../context/useApp';
 import { useCustomer } from '../context/useCustomer';
+import { validateTowingDestination } from '../utils/towingDestination';
 export function RequestMatching() {
   const {
     request,
@@ -18,9 +19,10 @@ export function RequestMatching() {
   } = useCustomer();
   const navigate = useNavigate();
   if (vehicleStatus === 'loading') return <RequestFrame title={tr("Your vehicle")} subtitle={tr("Loading...")} />;
+  if (request.serviceType === 'towing' && validateTowingDestination(request, location)) return <Navigate to="/request/towing" replace />;
   if (!selectedVehicle || !request.issueType) return <Navigate to="/request" replace />;
   if (!(Number.isFinite(location.latitude) && Number.isFinite(location.longitude)) && (!location.address || location.address === 'Use current location' || location.address.trim().length < 5)) return <Navigate to="/confirm-location" replace />;
-  return <RequestFrame backTo="/confirm-location" title={tr("Find your buddy")} subtitle={tr("Choose how you want to find help. Step 4 of 4")}>
+  return <RequestFrame backTo={request.serviceType === 'towing' ? '/request/towing' : '/confirm-location'} title={tr("Find your buddy")} subtitle={tr("Choose how you want to find help.")}>
     <form className="request-form" onSubmit={event => {
       event.preventDefault();
       navigate('/providers');
@@ -47,7 +49,7 @@ export function RequestMatching() {
             matchingMode: value
           })} /><Icon size={22} /><span><strong>{tr(title)}</strong><small>{tr(description)}</small></span></label>)}
       </fieldset>
-      <p className="auth-hint">{tr("Review the provider and visit estimate before booking. Repairs need separate approval after diagnosis.")}</p>
+      <p className="auth-hint">{tr(request.serviceType === 'towing' ? 'Review your towing provider, route and transport estimate before booking.' : 'Review the provider and visit estimate before booking. Repairs need separate approval after diagnosis.')}</p>
       <button type="submit" className="auth-primary request-continue"><ArrowRight size={20} />{request.matchingMode === 'auto' ? tr("Find my match") : tr("Find available providers")}</button>
     </form>
   </RequestFrame>;

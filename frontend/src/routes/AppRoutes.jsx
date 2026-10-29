@@ -30,6 +30,7 @@ import { Providers } from '../pages/Providers';
 import { RequestAssistance } from '../pages/RequestAssistance';
 import { RequestDetails } from '../pages/RequestDetails';
 import { RequestMatching } from '../pages/RequestMatching';
+import { TowingRequest } from '../pages/TowingRequest';
 
 export function AppRoutes() {
   return (
@@ -61,6 +62,7 @@ export function AppRoutes() {
       </Route>
       <Route element={<MainLayout />}>
         <Route path="request" element={<RequestAssistance />} />
+        <Route path="request/towing" element={<TowingRequest />} />
         <Route path="request/details" element={<RequestDetails />} />
         <Route path="request/matching" element={<RequestMatching />} />
         <Route path="confirm-location" element={<ConfirmLocation />} />

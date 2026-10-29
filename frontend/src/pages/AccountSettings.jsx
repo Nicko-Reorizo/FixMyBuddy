@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { Bell, LocateFixed, QrCode, ShieldCheck, Languages } from 'lucide-react';
+import { Bell, LocateFixed, QrCode, ShieldCheck, Languages, Sun, Moon, Monitor, SunMoon } from 'lucide-react';
 import { CustomerHeading } from '../components/customer/CustomerHeading';
 import { useLocale } from '../context/useLocale';
 import { useBrowserPermissions } from '../hooks/useBrowserPermissions';
+import { useTheme } from '../context/useTheme';
 export function AccountSettings() {
   const { section } = useParams();
   const { language, setLanguage, storageError, t } = useLocale();
   const permissions = useBrowserPermissions();
+  const theme = useTheme();
   const [busy, setBusy] = useState(false), [error, setError] = useState('');
   const labels = { notifications: t('Notifications','Mga abiso'), location: t('Location access','Access sa lokasyon'), privacy: t('Privacy & sharing','Privacy at pagbabahagi'), payments: t('QR payments','Pagbabayad gamit ang QR'), language: t('Language','Wika') };
   const permissionLabel = value => value === 'granted' ? t('Allowed by browser','Pinayagan ng browser') : value === 'denied' ? t('Blocked by browser','Hinarang ng browser') : value === 'unsupported' ? t('Not supported by this browser','Hindi suportado ng browser') : value === 'prompt' || value === 'default' ? t('Not allowed yet','Hindi pa pinapahintulutan') : t('Permission status unavailable','Hindi makuha ang estado ng pahintulot');
@@ -17,8 +19,13 @@ export function AccountSettings() {
     catch (problem) { setError(problem.message); } finally { setBusy(false); }
   }
   return <>
-    <CustomerHeading title={labels[section] || t('Settings','Mga setting')} backTo="/account">{t('Your choice, clearly explained.','Malinaw ang iyong mga pagpipilian.')}</CustomerHeading>
-    {section === 'language' ? <section className="settings-section"><Languages size={28} /><fieldset className="settings-languages"><legend>{t('Choose your language','Piliin ang iyong wika')}</legend>{[['en','English'],['fil','Filipino']].map(([value,label]) => <label key={value}><input type="radio" name="language" checked={language === value} onChange={() => setLanguage(value)} />{label}</label>)}</fieldset><p className="auth-hint">{storageError ? t('Language changed for this tab; browser storage is unavailable.','Nabago ang wika sa tab na ito; hindi gumagana ang browser storage.') : t('Your language preference is saved on this device.','Naka-save sa device na ito ang pinili mong wika.')}</p></section>
+    <CustomerHeading title={section === 'appearance' ? t('Appearance','Hitsura') : labels[section] || t('Settings','Mga setting')} backTo="/account">{t('Your choice, clearly explained.','Malinaw ang iyong mga pagpipilian.')}</CustomerHeading>
+    {section === 'appearance' ? <section className="settings-section"><SunMoon size={28} /><fieldset className="settings-languages theme-options"><legend>{t('Choose what is easiest on your eyes','Piliin ang pinakamaginhawa sa iyong mata')}</legend>{[
+      ['light', Sun, t('Light','Maliwanag'), t('Light background with dark text.','Maliwanag na background at madilim na teksto.')],
+      ['dark', Moon, t('Dark','Madilim'), t('Dark background with light text.','Madilim na background at maliwanag na teksto.')],
+      ['system', Monitor, t('Use device setting','Sundin ang setting ng device'), t('Automatically follows your device appearance.','Awtomatikong sumusunod sa hitsura ng iyong device.')]
+    ].map(([value, Icon, label, description]) => <label key={value}><input type="radio" name="appearance" checked={theme.preference === value} onChange={() => theme.setTheme(value)} /><Icon size={24} aria-hidden="true" /><span><strong>{label}</strong><small>{description}</small></span></label>)}</fieldset><p className="auth-hint" role="status">{theme.storageError ? t('Appearance changed for this tab. Your browser could not save it.','Nabago ang hitsura sa tab na ito. Hindi ito ma-save ng browser.') : t('Your choice is saved on this device. You can change it anytime.','Naka-save ang pinili mo sa device na ito. Maaari mo itong baguhin anumang oras.')}</p></section>
+      : section === 'language' ? <section className="settings-section"><Languages size={28} /><fieldset className="settings-languages"><legend>{t('Choose your language','Piliin ang iyong wika')}</legend>{[['en','English'],['fil','Filipino']].map(([value,label]) => <label key={value}><input type="radio" name="language" checked={language === value} onChange={() => setLanguage(value)} />{label}</label>)}</fieldset><p className="auth-hint">{storageError ? t('Language changed for this tab; browser storage is unavailable.','Nabago ang wika sa tab na ito; hindi gumagana ang browser storage.') : t('Your language preference is saved on this device.','Naka-save sa device na ito ang pinili mong wika.')}</p></section>
       : section === 'notifications' || section === 'location' ? <section className="settings-section">
         {section === 'notifications' ? <Bell size={28} /> : <LocateFixed size={28} />}
         <h2>{permissionLabel(permissions[section])}</h2>

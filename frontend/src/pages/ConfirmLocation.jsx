@@ -31,6 +31,7 @@ export function ConfirmLocation() {
   const navigate = useNavigate();
   const hasCoordinates = Number.isFinite(location.latitude) && Number.isFinite(location.longitude);
   if (vehicleStatus === 'loading') return <RequestFrame title={tr("Your vehicle")} subtitle={tr("Loading...")} />;
+  if (request.serviceType === 'towing') return <Navigate to="/request/towing" replace />;
   if (!selectedVehicle || !request.issueType || request.serviceType === 'towing' && request.destination.trim().length < 5) return <Navigate to="/request" replace />;
   async function locate() {
     const result = await requestLocation();

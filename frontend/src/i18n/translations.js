@@ -64,6 +64,8 @@ export const filipino = {
   "Vehicle": "Sasakyan",
   "Vehicle type": "Uri ng sasakyan",
   "Make": "Brand",
+  "Brand": "Brand",
+  "Enter the vehicle brand.": "Ilagay ang brand ng sasakyan.",
   "Model": "Modelo",
   "Year": "Taon",
   "Color": "Kulay",
@@ -526,6 +528,21 @@ Object.assign(filipino, {
   'Step {0} of 4': 'Hakbang {0} sa 4',
   'Choose the closest match. You can change it later.': 'Piliin ang pinakamalapit na problema. Maaari mo itong baguhin mamaya.',
   'Add details to help your provider prepare.': 'Magdagdag ng detalye para makapaghanda ang tutulong sa iyo.'
+});
+Object.assign(filipino, {
+  'Step {0} of {1}': 'Hakbang {0} sa {1}',
+  'Choose how you want to find help.': 'Piliin kung paano ka maghahanap ng tulong.',
+  'Return to towing request': 'Bumalik sa towing request',
+  'Towing assistance': 'Tulong sa towing',
+  'Review your towing provider, route and transport estimate before booking.': 'Suriin ang towing provider, ruta at tinatayang gastos sa pagdadala bago mag-book.',
+  'Choose a repair shop from the search results or enter your own destination.': 'Pumili ng talyer sa mga resulta o ilagay ang sariling destinasyon.',
+  'Enter a full towing destination.': 'Ilagay ang buong address ng destinasyon.',
+  'Repair shop search is not connected yet. You can enter a destination instead.': 'Hindi pa nakakonekta ang paghahanap ng talyer. Maaari mong ilagay ang destinasyon.',
+  'Repair shop search is unavailable. You can enter a destination instead.': 'Hindi magamit ang paghahanap ng talyer. Maaari mong ilagay ang destinasyon.',
+  'Please sign in before searching for repair shops.': 'Mag-sign in muna bago maghanap ng talyer.',
+  'Could not load repair shops. Please try again.': 'Hindi makuha ang mga talyer. Subukan muli.',
+  'Repair shop results could not be read. Please try again.': 'Hindi mabasa ang resulta ng mga talyer. Subukan muli.',
+  'Repair shop search timed out. Please try again.': 'Naubos ang oras ng paghahanap ng talyer. Subukan muli.'
 });
 let activeLanguage = 'en';
 filipino['Confirm vehicle handover before paying for this tow.'] = 'Kumpirmahin muna ang handover bago magbayad sa towing.';

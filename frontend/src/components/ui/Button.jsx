@@ -4,7 +4,7 @@ const variants = {
   primary: 'primary-action',
   secondary: 'secondary-action',
   muted: 'muted-action',
-  ghost: 'inline-flex h-11 items-center justify-center rounded-lg px-3 text-sm font-semibold text-slate-300 transition hover:bg-white/5 hover:text-white',
+  ghost: 'inline-flex h-11 items-center justify-center rounded-lg px-3 text-base font-semibold text-[rgb(var(--fmb-muted))] transition hover:bg-white/5 hover:text-[rgb(var(--fmb-text))]',
 };
 
 export function Button({

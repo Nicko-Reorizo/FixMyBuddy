@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { CarFront, ChevronRight, LogIn, LogOut, MapPin, UserRound, Bell, LockKeyhole, Wallet, Languages, Headphones, HeartHandshake } from 'lucide-react';
+import { CarFront, ChevronRight, LogIn, LogOut, MapPin, UserRound, Bell, LockKeyhole, Wallet, Languages, Headphones, HeartHandshake, SunMoon } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { CustomerHeading } from '../components/customer/CustomerHeading';
 import { useAuth } from '../context/useAuth';
@@ -7,11 +7,13 @@ import { useApp } from '../context/useApp';
 import { useCustomer } from '../context/useCustomer';
 import { useLocale } from '../context/useLocale';
 import { useBrowserPermissions } from '../hooks/useBrowserPermissions';
+import { useTheme } from '../context/useTheme';
 export function Account() {
   const { user, signOut } = useAuth();
   const { resetRequest, setLocation } = useApp();
   const { vehicles } = useCustomer();
   const { language, t } = useLocale();
+  const { preference } = useTheme();
   const permissions = useBrowserPermissions();
   const [busy, setBusy] = useState(false), [error, setError] = useState('');
   const dialog = useRef(null);
@@ -29,6 +31,7 @@ export function Account() {
       ['/settings/location', MapPin, t('Location access','Access sa lokasyon'), state(permissions.location)],
       ['/settings/payments', Wallet, t('Payment method','Paraan ng pagbabayad'), t('Provider GCash QR','GCash QR ng provider')],
       ['/settings/language', Languages, t('Language','Wika'), language === 'fil' ? 'Filipino' : 'English'],
+      ['/settings/appearance', SunMoon, t('Appearance','Hitsura'), preference === 'light' ? t('Light','Maliwanag') : preference === 'dark' ? t('Dark','Madilim') : t('Use device setting','Sundin ang setting ng device')],
     ],
   ];
   async function logout() {

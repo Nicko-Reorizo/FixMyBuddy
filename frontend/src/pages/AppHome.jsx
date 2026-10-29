@@ -65,7 +65,7 @@ export function AppHome() {
       vehicleId: selectedVehicle?.id || '',
       scheduledAt: timing === 'scheduled' ? new Date(selectedTime).toISOString() : null
     });
-    navigate(selectedVehicle ? `/request?service=${service}` : `/vehicles?continue=${service}`);
+    navigate(selectedVehicle ? service === 'towing' ? '/request/towing' : '/request?service=mechanic' : `/vehicles?continue=${service}`);
   }
   return <>
       <CustomerHeading title={name ? trTemplate(["We've got you, ", "."], [name]) : tr("We've got you.")}>{tr("Roadside help, without the guesswork.")}</CustomerHeading>

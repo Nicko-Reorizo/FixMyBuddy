@@ -51,6 +51,7 @@ const api = http.createServer(async (req, res) => {
   let result;
   if (req.url === '/customers/me/bookings/history-completed/receipt') { res.setHeader('Content-Type', 'application/pdf'); res.end(receiptFixture()); return; }
   if (req.url === '/auth/session') result = { user: sessionUser };
+  else if (req.url === '/repair-shops/search') result = { shops: [{ id: 'qa-repair-shop', name: 'QA repair shop (test only)', address: 'QA test destination address', latitude: 13.62, longitude: 123.19, distanceKm: 2 }] };
   else if (req.url.endsWith('/towing/handover')) {
     const booking = bookings.find(item => item.id === req.url.split('/')[4]);
     if (!booking || booking.towing.status !== 'at_destination' || body.pin !== 'QA-TEST-PIN' || !body.vehicleReceived || !body.keysReceived) { res.writeHead(409).end(); return; }

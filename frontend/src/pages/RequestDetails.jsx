@@ -8,8 +8,6 @@ import { RequestFrame } from '../components/app/RequestFrame';
 import { RequestVehicle } from '../components/app/RequestVehicle';
 import { ACCEPTED_MEDIA, MAX_ATTACHMENTS, validateAttachment } from '../utils/attachmentValidation';
 import { issuesFor } from '../data/requestIssues';
-import { TowingCondition } from '../components/customer/TowingCondition';
-import { validTowingCondition } from '../utils/towingValidation';
 function MediaPreview({
   file,
   onRemove
@@ -42,7 +40,7 @@ export function RequestDetails() {
   const [errors, setErrors] = useState([]);
   if (vehicleStatus === 'loading') return <RequestFrame title={tr("Your vehicle")} subtitle={tr("Loading...")} />;
   if (!selectedVehicle) return <Navigate to={`/vehicles?continue=${request.serviceType}`} replace />;
-  if (!issuesFor(request.serviceType).some(item => item.title === request.issueType)) return <Navigate to="/request" replace />;
+  if (request.serviceType !== 'towing' && !issuesFor(request.serviceType).some(item => item.title === request.issueType)) return <Navigate to="/request" replace />;
   const towing = request.serviceType === 'towing';
   function addFiles(event) {
     const next = [...attachments];
@@ -57,32 +55,20 @@ export function RequestDetails() {
   }
   function submit(event) {
     event.preventDefault();
-    if (towing && !validTowingCondition(request.towingCondition)) {
-      setErrors(['Answer all towing vehicle-condition questions.']);
-      return;
-    }
-    if (towing && request.destination.trim().length < 5) {
-      setErrors(['Enter a full towing destination.']);
-      return;
-    }
     updateRequest({
       vehicleId: selectedVehicle.id
     });
-    navigate('/confirm-location');
+    navigate(towing ? '/request/towing' : '/confirm-location');
   }
-  return <RequestFrame backTo={`/request?service=${request.serviceType}`} title={tr("Tell us what happened")} subtitle={tr("Add details to help your provider prepare.")}>
+  return <RequestFrame backTo={towing ? '/request/towing' : '/request?service=mechanic'} title={tr("Tell us what happened")} subtitle={tr("Add details to help your provider prepare.")}>
     <form className="request-form" onSubmit={submit}>
       <RequestVehicle vehicle={selectedVehicle} service={request.serviceType} />
-      <div className="request-selection"><span>{request.issueType} {tr("selected")}</span><Link to={`/request?service=${request.serviceType}`}>{tr("Change issue")}</Link></div>
+      {!towing && <div className="request-selection"><span>{request.issueType} {tr("selected")}</span><Link to="/request?service=mechanic">{tr("Change issue")}</Link></div>}
       <label className="request-field">{tr("Issue description")}<span className="request-optional">{tr("Optional")}</span>
         <textarea rows={4} maxLength={2000} value={request.notes} onChange={event => updateRequest({
           notes: event.target.value
         })} placeholder={tr("What happened? What symptoms have you noticed?")} />
       </label>
-      {towing && <label className="request-field">{tr("Towing destination")}<input required minLength={5} maxLength={300} value={request.destination} onChange={event => updateRequest({
-          destination: event.target.value
-        })} placeholder={tr("Street, barangay, city or repair shop address")} autoComplete="street-address" /></label>}
-      {towing && <TowingCondition value={request.towingCondition} onChange={value => updateRequest({ towingCondition: value })} />}
       <div className="request-attachment-heading"><h2>{tr("Photos & videos")}<span className="request-optional">{tr("Optional")}</span></h2><span aria-live="polite">{attachments.length} / 10</span></div>
       <div className="request-media-grid">
         {attachments.map((file, index) => <MediaPreview key={`${file.name}-${file.lastModified}-${file.size}`} file={file} onRemove={() => {
@@ -95,7 +81,7 @@ export function RequestDetails() {
       <p className="auth-hint">{tr("Attachments stay in this tab until you leave or reload. Nothing has been uploaded.")}</p>
       <div className="request-safety"><ShieldAlert size={21} /><p>{request.issueType === 'Accident' ? tr("If anyone is injured or in immediate danger, contact emergency services first.") : request.issueType === 'Battery' ? tr("Do not touch leaking batteries or exposed wires. Wait in a safe place.") : tr("Only take photos when it is safe. Stay clear of moving traffic.")}</p></div>
       {errors.length > 0 && <div className="auth-error" role="alert">{errors.map(message => <p key={message}>{tr(message)}</p>)}</div>}
-      <button type="submit" className="auth-primary request-continue"><ArrowRight size={20} />{tr("Continue to location")}</button>
+      <button type="submit" className="auth-primary request-continue"><ArrowRight size={20} />{tr(towing ? 'Return to towing request' : 'Continue to location')}</button>
     </form>
   </RequestFrame>;
 }

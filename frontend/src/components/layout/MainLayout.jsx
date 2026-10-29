@@ -7,6 +7,7 @@ export function MainLayout() {
     const title =
       {
         '/request': 'Request assistance',
+        '/request/towing': 'Request towing',
         '/request/details': 'Issue details',
         '/request/matching': 'Find your buddy',
         '/confirm-location': 'Confirm location',

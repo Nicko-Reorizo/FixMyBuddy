@@ -137,6 +137,12 @@ Request additions: destination (towing only), landmark, matchingMode. The backen
 
 Booking creation additionally sends estimateId, estimateVersion, cancellationPolicyId, paymentMethod `provider_qr`, and repairsApproved `false`. Never trust client totals, verification, availability, approval status or user IDs. Authenticate the cookie session, verify ownership, recheck quote expiry/price and provider availability atomically, and deduplicate retries server-side. Approving the visit does not approve repairs.
 
+## Nearby repair shops for towing
+
+`POST /repair-shops/search` accepts `{ location: { address, latitude?, longitude? }, vehicleType, radiusKm }` and returns `{ shops: [{ id, name, address, latitude?, longitude?, distanceKm? }] }`. Names and addresses must be nonempty strings; coordinates must be valid pairs, and any distance must be a nonnegative number. Resolve typed pickup addresses and compute search distances on the backend. Return only actual search results; the frontend does not fabricate shop records, opening hours, route distances or availability. Return an empty array for a successful search with no results and an error status when the service is unavailable.
+
+Towing requests now start at `/request/towing`. The request carries `destinationMode: 'manual' | 'nearby'` and `destinationShop: null | { id, name, address, latitude?, longitude?, distanceKm? }`, in addition to `destination` and `towingCondition`. Revalidate shop identity/address and destination on the server before generating a route or accepting a booking. Shop selection does not guarantee the shop is open or has accepted the vehicle. Manual addresses remain available without shop search. Do not trust client-supplied distances or totals.
+
 ## Provider QR and Separate Repairs
 
 Focused history bookings render server-provided `payment: { status, qrUrl?, payeeName?, reportable? }`. QR URLs must use HTTPS and should be hosted/validated by your backend. No QR is generated, no personal GCash account is prefilled, and missing/broken QR images do not offer payment reporting. Payment QR appears only on an actual returned booking, not as a prerequisite for search. Only `status: 'verified'` from the API shows confirmed receipt.

@@ -62,7 +62,7 @@ export function Vehicles() {
       vehicleId: vehicle.id,
       serviceType: service
     });
-    navigate(`/request?service=${service}`);
+    navigate(service === 'towing' ? '/request/towing' : '/request?service=mechanic');
   }
   function choose(vehicle) {
     try {
@@ -210,7 +210,7 @@ export function Vehicles() {
                 {errors.type}
               </p>}
           </div>
-          <AuthField id="make" name="make" label={tr("Make")} value={fields.make} onChange={update} error={errors.make} maxLength={60} />
+          <AuthField id="make" name="make" label={tr("Brand")} value={fields.make} onChange={update} error={errors.make} maxLength={60} />
           <div className="customer-form-row">
             <AuthField id="model" name="model" label={tr("Model")} value={fields.model} onChange={update} error={errors.model} maxLength={80} />
             <AuthField id="year" name="year" label={tr("Year")} type="number" inputMode="numeric" min="1900" max={new Date().getFullYear() + 1} value={fields.year} onChange={update} error={errors.year} />

@@ -7,10 +7,12 @@ import { AuthProvider } from './context/AuthProvider.jsx';
 import { CustomerProvider } from './context/CustomerProvider.jsx';
 import './styles/index.css';
 import { LocaleProvider } from './context/LocaleProvider.jsx';
+import { ThemeProvider } from './context/ThemeProvider.jsx';
+import './styles/theme.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <AppProvider>
+    <ThemeProvider><AppProvider>
       <AuthProvider>
         <CustomerProvider>
           <BrowserRouter>
@@ -18,6 +20,6 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           </BrowserRouter>
         </CustomerProvider>
       </AuthProvider>
-    </AppProvider>
+    </AppProvider></ThemeProvider>
   </React.StrictMode>,
 );

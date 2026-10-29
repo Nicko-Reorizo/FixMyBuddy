@@ -30,6 +30,7 @@ export function RequestAssistance() {
       issueType: ''
     });
   }, [service, request.serviceType, updateRequest]);
+  if (service === 'towing') return <Navigate to="/request/towing" replace />;
   if (vehicleStatus === 'loading') return <RequestFrame title={tr("Your vehicle")} subtitle={tr("Loading your vehicles...")} />;
   if (vehicleStatus === 'error') return <RequestFrame title={tr("Could not load vehicles")} subtitle={vehicleError || tr("Please return home and try again.")} />;
   if (!selectedVehicle) return <Navigate to={`/vehicles?continue=${service}`} replace />;

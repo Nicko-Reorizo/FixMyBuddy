@@ -2,6 +2,8 @@
 
 React + Tailwind CSS frontend for the FixMyBuddy roadside assistance app.
 
+Appearance: Account → Appearance offers Light, Dark and Use device setting. The default follows the device; an explicit choice is saved on this browser and synchronized across tabs. Switching appearance keeps forms and request drafts mounted. If browser storage is blocked, the choice still works for the current tab. Shared color tokens in `src/styles/theme.css` cover the interface while photos, map tiles and payment QR images retain their original colors.
+
 ## Tech Stack
 
 - React

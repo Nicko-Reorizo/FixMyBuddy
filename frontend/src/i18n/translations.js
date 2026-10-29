@@ -510,6 +510,23 @@ Object.assign(filipino, {
   'Could not save or load these details. Please try again.': 'Hindi ma-save o makuha ang detalye. Subukan muli.',
   'The request timed out. Check its status before retrying.': 'Naubos ang oras ng kahilingan. Suriin ang estado bago subukan muli.'
 });
+Object.assign(filipino, {
+  'Your bookings': 'Mga booking mo',
+  'Choose a booking to see its progress, cost or receipt.': 'Pumili ng booking para makita ang kalagayan, presyo o resibo nito.',
+  'Estimated cost': 'Tinatayang presyo',
+  'Waiting for price': 'Hinihintay ang presyo',
+  'Request sent': 'Naipadala ang kahilingan',
+  'On the way': 'Papunta na',
+  'Service in progress': 'Isinasagawa ang serbisyo',
+  'View booking': 'Tingnan ang booking',
+  'Arriving in {0} minutes': 'Darating sa loob ng {0} minuto',
+  'Arrival time not available': 'Wala pang oras ng pagdating'
+});
+Object.assign(filipino, {
+  'Step {0} of 4': 'Hakbang {0} sa 4',
+  'Choose the closest match. You can change it later.': 'Piliin ang pinakamalapit na problema. Maaari mo itong baguhin mamaya.',
+  'Add details to help your provider prepare.': 'Magdagdag ng detalye para makapaghanda ang tutulong sa iyo.'
+});
 let activeLanguage = 'en';
 filipino['Confirm vehicle handover before paying for this tow.'] = 'Kumpirmahin muna ang handover bago magbayad sa towing.';
 filipino['Answer all towing vehicle-condition questions.'] = 'Sagutin ang lahat ng tanong sa kondisyon ng sasakyan.';

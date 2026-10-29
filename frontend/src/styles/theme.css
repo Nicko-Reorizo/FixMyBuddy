@@ -82,4 +82,26 @@
   .towing-map-empty { display: flex; align-items: flex-start; gap: .75rem; padding: 1rem; border: 1px solid rgb(var(--fmb-border)); border-radius: .75rem; background: rgb(var(--fmb-panel)); }
   .towing-map-empty svg { color: rgb(var(--fmb-accent)); }
   .towing-map-empty p { margin: 0; font-size: 1rem; line-height: 1.5; color: rgb(var(--fmb-muted)); }
+  .active-service { display: flex; flex-direction: column; gap: 1.25rem; margin-bottom: 2rem; min-width: 0; animation: buddy-screen 350ms ease-out both; }
+  .active-service h2 { margin: 0; font-size: 1.125rem; font-weight: 650; display: flex; align-items: center; gap: .5rem; }
+  .service-provider { display: flex; align-items: flex-start; gap: .75rem; }
+  .service-provider > svg { color: rgb(var(--fmb-accent)); }
+  .service-provider p { margin: .25rem 0 0; font-size: 1rem; color: rgb(var(--fmb-muted)); }
+  .service-arrival { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; margin: 0; font-size: 1.125rem; }
+  .service-location { margin: 0; border: 1px solid rgb(var(--fmb-border)); border-radius: .75rem; overflow: hidden; }
+  .service-location iframe { width: 100%; height: 240px; border: 0; }
+  .service-location figcaption { padding: .75rem; font-size: 1rem; color: rgb(var(--fmb-muted)); }
+  .service-timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1.5rem; }
+  .service-timeline li { display: flex; gap: .75rem; align-items: flex-start; }
+  .service-timeline svg { color: rgb(var(--fmb-muted)); margin-top: .25rem; }
+  .service-timeline li[data-state='current'] svg, .service-timeline li[data-state='completed'] svg { color: rgb(var(--fmb-accent)); }
+  .service-timeline strong { display: block; font-size: 1.125rem; font-weight: 600; overflow-wrap: anywhere; }
+  .service-timeline small { display: block; font-size: 1rem; margin-top: .25rem; color: rgb(var(--fmb-muted)); }
+  .service-pin, .service-update { border: 1px solid rgb(var(--fmb-border)); border-radius: .75rem; background: rgb(var(--fmb-panel)); padding: 1rem; }
+  .service-pin-value { display: block; font-size: 2rem; letter-spacing: .2em; margin-block: 1rem; overflow-wrap: anywhere; }
+  .service-update h3 { font-size: 1.125rem; font-weight: 650; margin: 0; }
+  .service-update p { white-space: pre-wrap; font-size: 1rem; line-height: 1.6; overflow-wrap: anywhere; }
+  .service-update small { display: block; font-size: 1rem; color: rgb(var(--fmb-muted)); }
+  .service-update img { display: block; width: 100%; max-height: 280px; object-fit: contain; margin-block: .75rem; border-radius: .5rem; }
+  .service-updates { display: flex; flex-direction: column; gap: 1rem; }
 

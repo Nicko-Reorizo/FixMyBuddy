@@ -23,7 +23,7 @@ export function CustomerLayout() {
         '/account': 'Account',
         '/vehicles': 'My vehicles',
         '/location': 'Pickup location',
-      }[pathname] || 'Customer';
+      }[pathname] || (pathname.endsWith('/service') ? 'Active service' : pathname.endsWith('/provider-chat') ? 'Mechanic chat' : 'Customer');
     document.title = `${title} | FixMyBuddy`;
   }, [pathname, language]);
 

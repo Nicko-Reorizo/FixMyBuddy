@@ -544,6 +544,13 @@ Object.assign(filipino, {
   'Repair shop results could not be read. Please try again.': 'Hindi mabasa ang resulta ng mga talyer. Subukan muli.',
   'Repair shop search timed out. Please try again.': 'Naubos ang oras ng paghahanap ng talyer. Subukan muli.'
 });
+Object.assign(filipino, {
+  'View service': 'Tingnan ang serbisyo',
+  'Arrival PIN is unavailable or expired. Refresh your service before trying again.': 'Hindi makuha o paso na ang arrival PIN. I-refresh ang serbisyo bago subukan muli.',
+  'Could not load provider messages.': 'Hindi makuha ang mga mensahe ng provider.',
+  'Could not confirm your message. Refresh before retrying.': 'Hindi makumpirma ang mensahe. I-refresh bago subukan muli.',
+  'Open service progress and chat': 'Buksan ang progreso ng serbisyo at chat'
+});
 let activeLanguage = 'en';
 filipino['Confirm vehicle handover before paying for this tow.'] = 'Kumpirmahin muna ang handover bago magbayad sa towing.';
 filipino['Answer all towing vehicle-condition questions.'] = 'Sagutin ang lahat ng tanong sa kondisyon ng sasakyan.';

@@ -9,6 +9,7 @@ import './styles/index.css';
 import { LocaleProvider } from './context/LocaleProvider.jsx';
 import { ThemeProvider } from './context/ThemeProvider.jsx';
 import './styles/theme.css';
+import './styles/welcome.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

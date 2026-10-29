@@ -31,6 +31,8 @@ import { RequestAssistance } from '../pages/RequestAssistance';
 import { RequestDetails } from '../pages/RequestDetails';
 import { RequestMatching } from '../pages/RequestMatching';
 import { TowingRequest } from '../pages/TowingRequest';
+import { ActiveService } from '../pages/ActiveService';
+import { ProviderChat } from '../pages/ProviderChat';
 
 export function AppRoutes() {
   return (
@@ -56,6 +58,8 @@ export function AppRoutes() {
         <Route path="help/chat" element={<SupportChat />} />
         <Route path="help/disputes" element={<Disputes />} />
         <Route path="bookings/:bookingId/towing-chat" element={<TowingChat />} />
+        <Route path="bookings/:bookingId/service" element={<ActiveService />} />
+        <Route path="bookings/:bookingId/provider-chat" element={<ProviderChat />} />
         <Route path="updates" element={<Updates />} />
         <Route path="location" element={<PickupLocation />} />
         <Route path="history" element={<History />} />

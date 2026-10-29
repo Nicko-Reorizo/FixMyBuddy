@@ -11,7 +11,7 @@ export async function accountRequest(path, { method = 'GET', body, signal } = {}
   const timeout = setTimeout(abort, body instanceof FormData ? 120000 : 15000);
   try {
     const multipart = body instanceof FormData;
-    const response = await networkFetch(`${baseUrl}${path}`, { method, credentials: 'include', signal: controller.signal, headers: { Accept: 'application/json', ...(body && !multipart ? { 'Content-Type': 'application/json' } : {}) }, ...(body ? { body: multipart ? body : JSON.stringify(body) } : {}) });
+    const response = await networkFetch(`${baseUrl}${path}`, { method, credentials: 'include', cache: 'no-store', signal: controller.signal, headers: { Accept: 'application/json', ...(body && !multipart ? { 'Content-Type': 'application/json' } : {}) }, ...(body ? { body: multipart ? body : JSON.stringify(body) } : {}) });
     if (!response.ok) {
       if (response.status === 401) throw new Error('Please sign in to continue.');
       if (response.status === 409) throw new Error('These details changed. Refresh before trying again.');

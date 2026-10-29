@@ -4,8 +4,10 @@ import { ShieldCheck, Save } from 'lucide-react';
 import { useAuth } from '../../context/useAuth';
 import { useLocale } from '../../context/useLocale';
 import { accountService } from '../../services/accountService';
+import { useCustomer } from '../../context/useCustomer';
 export function BookingSharing({ booking }) {
   const { user } = useAuth(), { t } = useLocale();
+  const { refreshData } = useCustomer();
   const [confirmed, setConfirmed] = useState(booking.sharing?.enabled === true);
   const [enabled, setEnabled] = useState(booking.sharing?.enabled === true);
   const [busy, setBusy] = useState(false), [error, setError] = useState(''), [notice, setNotice] = useState('');
@@ -17,6 +19,7 @@ export function BookingSharing({ booking }) {
       const sharing = await accountService.sharing(booking.id, enabled, booking.version);
       setConfirmed(sharing.enabled); setEnabled(sharing.enabled);
       setNotice(sharing.enabled ? t('Sharing is enabled for this booking only.','Pinayagan ang pagbabahagi para lang sa booking na ito.') : t('Sharing is disabled for this booking.','Naka-off ang pagbabahagi para sa booking na ito.'));
+      refreshData();
     } catch (problem) { setError(problem.message); } finally { setBusy(false); }
   }
   return <section className="booking-sharing"><h2><ShieldCheck size={20} />{t('Booking sharing','Pagbabahagi sa booking')}</h2><p className="auth-hint">{t('Share this booking and pickup location with your saved emergency contact only when you choose.','Ibahagi lang ang booking at pickup location sa iyong naka-save na emergency contact kapag pinili mo.')}</p>

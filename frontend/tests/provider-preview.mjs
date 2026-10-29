@@ -12,7 +12,15 @@ const vehicle = { id: 'test-vehicle', make: 'QA', model: 'Fixture vehicle', year
 let sessionUser = { id: 'test-customer', name: 'QA fixture customer', phoneVerified: true, emergencyContact: { name: 'QA trusted contact', phone: '+639170000000', relationship: 'Friend' } };
 const supportMessages = [];
 const disputes = [];
+const qaTime = new Date().toISOString();
+const qaMechanic = { id: 'qa-mechanic', name: 'QA mechanic (test only)', chatEnabled: true, verified: true, rating: 4.7, reviewsCount: 1 };
+const qaRepair = { id: 'qa-repair-quote', version: 1, currency: 'PHP', total: 425.5, items: [{ label: 'QA test repair only', amount: 425.5 }] };
+const qaRevision = { id: 'qa-revision', version: 2, currency: 'PHP', total: 475.5, items: [{ label: 'QA test repair only', amount: 425.5 }, { label: 'QA additional work only', amount: 50 }], baseQuoteId: qaRepair.id, baseQuoteVersion: qaRepair.version };
 const bookings = [
+  { id: 'qa-active-mechanic', version: 1, reference: 'QA-ACTIVE', serviceType: 'mechanic', issueType: 'QA active service (test only)', status: 'en_route', providerName: qaMechanic.name, mechanic: { status: 'en_route', provider: qaMechanic, updatedAt: qaTime, etaMinutes: 10, arrivalPinAvailable: true, timeline: [{ id: 'qa-confirmed', label: 'QA booking confirmed', status: 'completed', at: qaTime }, { id: 'qa-travel', label: 'QA mechanic on the way', status: 'current' }, { id: 'qa-arrival', label: 'QA arrival and inspection', status: 'upcoming' }] } },
+  { id: 'qa-repair-review', version: 1, reference: 'QA-REPAIR', serviceType: 'mechanic', issueType: 'QA repair approval (test only)', status: 'in_progress', repairApprovalStatus: 'awaiting_customer', repairEstimate: qaRepair, mechanic: { status: 'awaiting_approval', provider: qaMechanic, updatedAt: qaTime, diagnosis: { summary: 'QA test findings only. No real diagnosis.', createdAt: qaTime }, timeline: [{ id: 'qa-diagnosis', label: 'QA diagnosis completed', status: 'completed', at: qaTime }, { id: 'qa-approval', label: 'QA customer decision', status: 'current' }] } },
+  { id: 'qa-extra-review', version: 1, reference: 'QA-EXTRA', serviceType: 'mechanic', issueType: 'QA extra work (test only)', status: 'in_progress', repairApprovalStatus: 'approved', approvedQuote: qaRepair, pendingRevision: qaRevision, revisionStatus: 'awaiting_customer', mechanic: { status: 'awaiting_approval', workPaused: true, provider: qaMechanic, updatedAt: qaTime, timeline: [{ id: 'qa-extra', label: 'QA additional work requires a decision', status: 'current' }], updates: [{ id: 'qa-findings', title: 'QA additional finding', body: 'QA-only example. Nothing has been repaired or charged.', createdAt: qaTime }] } },
+  { id: 'qa-repair-progress', version: 1, reference: 'QA-PROGRESS', serviceType: 'mechanic', issueType: 'QA repair progress (test only)', status: 'in_progress', repairApprovalStatus: 'approved', approvedQuote: qaRepair, mechanic: { status: 'repairing', provider: qaMechanic, updatedAt: qaTime, timeline: [{ id: 'qa-approved', label: 'QA repair approved', status: 'completed', at: qaTime }, { id: 'qa-working', label: 'QA repair being performed', status: 'current' }, { id: 'qa-final', label: 'QA final test', status: 'upcoming' }], updates: [{ id: 'qa-update', title: 'QA repair update', body: 'This is an isolated test update, not a real service.', createdAt: qaTime }] } },
   { id: 'test-tow-handover', version: 1, serviceType: 'towing', issueType: 'Breakdown', vehicleId: vehicle.id, status: 'in_progress', towing: { status: 'at_destination', canConfirmHandover: true, destinationAddress: 'QA test destination', provider: { name: 'QA towing provider (test only)', chatEnabled: true }, handover: { requiresPin: true } } },
   { id: 'history-upcoming', version: 1, reference: 'QA-UPCOMING', serviceType: 'mechanic', issueType: 'QA scheduled service', vehicleId: vehicle.id, vehicleLabel: 'QA fixture vehicle', providerName: provider.name, scheduledAt: '2027-01-20T02:00:00Z', status: 'scheduled', quotedAmount: 425.5, canCancel: true, canReschedule: true, cancellationPolicy: provider.cancellationPolicy, payment: { status: 'unverified' } },
   { id: 'history-completed', version: 1, reference: 'QA-COMPLETED', serviceType: 'towing', issueType: 'QA completed towing', vehicleId: vehicle.id, vehicleLabel: 'QA fixture vehicle', providerName: provider.name, createdAt: '2026-10-20T02:00:00Z', status: 'completed', paidAmount: 425.5, quotedAmount: 425.5, receiptAvailable: true, payment: { status: 'verified' } },
@@ -21,6 +29,7 @@ const bookings = [
 let reminders = [];
 const updates = [{ id: 'test-update', type: 'booking_confirmed', title: 'QA booking update', message: 'Isolated test notification, not a real booking.', bookingId: 'history-upcoming', createdAt: '2026-10-25T01:00:00Z', read: false }];
 const towingMessages = [];
+const mechanicConversations = new Map();
 function receiptFixture() {
   const stream = 'BT /F1 16 Tf 40 730 Td (TEST ONLY - NOT A REAL RECEIPT) Tj ET';
   const objects = ['<< /Type /Catalog /Pages 2 0 R >>', '<< /Type /Pages /Kids [3 0 R] /Count 1 >>', '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 5 0 R >> >> /Contents 4 0 R >>', `<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`, '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>'];
@@ -51,6 +60,39 @@ const api = http.createServer(async (req, res) => {
   let result;
   if (req.url === '/customers/me/bookings/history-completed/receipt') { res.setHeader('Content-Type', 'application/pdf'); res.end(receiptFixture()); return; }
   if (req.url === '/auth/session') result = { user: sessionUser };
+  else if (req.url.endsWith('/mechanic/arrival-pin')) {
+    const booking = bookings.find(item => item.id === req.url.split('/')[4]);
+    if (!booking?.mechanic?.arrivalPinAvailable) { res.writeHead(404).end(); return; }
+    res.setHeader('Cache-Control', 'no-store');
+    result = { bookingId: booking.id, pin: 'QA1234', expiresAt: new Date(Date.now() + 300000).toISOString() };
+  }
+  else if (req.url.endsWith('/mechanic/messages')) {
+    const booking = bookings.find(item => item.id === req.url.split('/')[4]);
+    if (!booking?.mechanic?.provider?.chatEnabled) { res.writeHead(404).end(); return; }
+    if (!mechanicConversations.has(booking.id)) mechanicConversations.set(booking.id, []);
+    const conversation = mechanicConversations.get(booking.id);
+    if (req.method === 'GET') result = { messages: conversation };
+    else {
+      let message = conversation.find(item => item.clientId === body.clientId);
+      if (!message) { message = { id: 'qa-message-' + conversation.length, sender: 'customer', body: body.body, clientId: body.clientId, createdAt: new Date().toISOString() }; conversation.push(message); }
+      result = { message };
+    }
+  }
+  else if (req.url.endsWith('/quote-decision')) {
+    const booking = bookings.find(item => item.id === req.url.split('/')[4]);
+    const revision = booking?.revisionStatus === 'awaiting_customer';
+    const quote = revision ? booking.pendingRevision : booking?.repairEstimate;
+    if (!quote || quote.id !== body.quoteId || quote.version !== body.quoteVersion || !['approve','reject'].includes(body.decision) || booking.version !== body.bookingVersion) { res.writeHead(409).end(); return; }
+    booking[revision ? 'revisionStatus' : 'repairApprovalStatus'] = body.decision === 'approve' ? 'approved' : 'rejected';
+    if (body.decision === 'approve') booking.approvedQuote = quote;
+    if (booking.mechanic) {
+      booking.mechanic.status = 'awaiting_provider';
+      booking.mechanic.updatedAt = new Date().toISOString();
+      booking.mechanic.timeline = [...(booking.mechanic.timeline || []).map(step => step.status === 'current' ? { ...step, status: 'completed', at: booking.mechanic.updatedAt } : step), { id: 'qa-provider-next', label: 'QA waiting for provider update', status: 'current' }];
+    }
+    booking.version += 1;
+    result = { booking, decision: { quoteId: quote.id, quoteVersion: quote.version, decision: body.decision } };
+  }
   else if (req.url === '/repair-shops/search') result = { shops: [{ id: 'qa-repair-shop', name: 'QA repair shop (test only)', address: 'QA test destination address', latitude: 13.62, longitude: 123.19, distanceKm: 2 }] };
   else if (req.url.endsWith('/towing/handover')) {
     const booking = bookings.find(item => item.id === req.url.split('/')[4]);

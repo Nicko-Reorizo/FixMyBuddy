@@ -9,7 +9,7 @@ export function ProviderCard({
 }) {
   const price = validEstimate(provider.estimate) ? provider.estimate.total : null;
   const content = <><ProviderIdentity provider={provider} compact />
-    <div className="provider-card-metrics"><span><Clock3 size={14} />{Number.isFinite(provider.etaMinutes) ? trTemplate(["", " min"], [provider.etaMinutes]) : tr("ETA pending")}{Number.isFinite(provider.distanceKm) && <> · {provider.distanceKm}{tr("km")}</>}</span>
+    <div className="provider-card-metrics"><span><Clock3 size={18} />{Number.isFinite(provider.etaMinutes) ? trTemplate(["Arriving in ", " minutes"], [provider.etaMinutes]) : tr("Arrival time not available")}{Number.isFinite(provider.distanceKm) && <> · {provider.distanceKm}{tr("km")}</>}</span>
       <strong>{price !== null ? new Intl.NumberFormat('en-PH', {
           style: 'currency',
           currency: 'PHP'

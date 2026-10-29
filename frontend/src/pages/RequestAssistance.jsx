@@ -48,7 +48,7 @@ export function RequestAssistance() {
     });
     navigate('/request/details');
   }
-  return <RequestFrame title={tr("What's the trouble?")} subtitle={trTemplate(["Request ", " \xB7 Step 1 of 4"], [service])}>
+  return <RequestFrame title={tr("What's the trouble?")} subtitle={tr("Choose the closest match. You can change it later.")}>
     <form onSubmit={submit} className="request-form">
       <RequestVehicle vehicle={selectedVehicle} service={service} />
       <fieldset className="request-issues"><legend className="sr-only">{tr("Choose your issue")}</legend>

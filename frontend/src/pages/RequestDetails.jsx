@@ -70,7 +70,7 @@ export function RequestDetails() {
     });
     navigate('/confirm-location');
   }
-  return <RequestFrame backTo={`/request?service=${request.serviceType}`} title={tr("Tell us what happened")} subtitle={trTemplate(["Request ", " \xB7 Step 2 of 4"], [request.serviceType])}>
+  return <RequestFrame backTo={`/request?service=${request.serviceType}`} title={tr("Tell us what happened")} subtitle={tr("Add details to help your provider prepare.")}>
     <form className="request-form" onSubmit={submit}>
       <RequestVehicle vehicle={selectedVehicle} service={request.serviceType} />
       <div className="request-selection"><span>{request.issueType} {tr("selected")}</span><Link to={`/request?service=${request.serviceType}`}>{tr("Change issue")}</Link></div>

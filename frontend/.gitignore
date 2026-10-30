@@ -1,0 +1,2 @@
+# Ignore dependency folders and caches for every frontend app.
+node_modules/

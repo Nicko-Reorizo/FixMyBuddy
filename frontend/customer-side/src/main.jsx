@@ -12,6 +12,7 @@ import './styles/theme.css';
 import './styles/welcome.css';
 import './styles/location-picker.css';
 import './styles/brand.css';
+import './styles/policies.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

@@ -1,11 +1,13 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
+
 import { MainLayout } from '../components/layout/MainLayout';
 import { CustomerLayout } from '../components/customer/CustomerLayout';
+import { AuthLayout } from '../components/auth/AuthLayout';
+
 import { Account } from '../pages/Account';
 import { Vehicles } from '../pages/Vehicles';
 import { Updates } from '../pages/Updates';
 import { PickupLocation } from '../pages/PickupLocation';
-import { AuthLayout } from '../components/auth/AuthLayout';
 import { SignIn } from '../pages/auth/SignIn';
 import { SignUp } from '../pages/auth/SignUp';
 import { VerifyPhone } from '../pages/auth/VerifyPhone';
@@ -24,12 +26,16 @@ import { Providers } from '../pages/Providers';
 import { RequestAssistance } from '../pages/RequestAssistance';
 import { RequestDetails } from '../pages/RequestDetails';
 import { RequestMatching } from '../pages/RequestMatching';
+import { MechanicRoutes } from './MechanicRoutes';
 
 export function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="start" element={<Navigate to="/" replace />} />
+
+      <Route path="/mechanic/*" element={<MechanicRoutes />} />
+
       <Route element={<AuthLayout />}>
         <Route path="login" element={<SignIn />} />
         <Route path="signup" element={<SignUp />} />
@@ -39,6 +45,7 @@ export function AppRoutes() {
         <Route path="profile" element={<SafetyProfile />} />
         <Route path="forgot-password" element={<ForgotPassword />} />
       </Route>
+
       <Route element={<CustomerLayout />}>
         <Route path="app" element={<AppHome />} />
         <Route path="vehicles" element={<Vehicles />} />
@@ -47,6 +54,7 @@ export function AppRoutes() {
         <Route path="location" element={<PickupLocation />} />
         <Route path="history" element={<History />} />
       </Route>
+
       <Route element={<MainLayout />}>
         <Route path="request" element={<RequestAssistance />} />
         <Route path="request/details" element={<RequestDetails />} />
@@ -56,8 +64,14 @@ export function AppRoutes() {
         <Route path="providers" element={<Providers />} />
         <Route path="provider-filters" element={<ProviderFilters />} />
         <Route path="providers/:providerId" element={<ProviderProfile />} />
-        <Route path="no-providers" element={<Navigate to="/providers" replace />} />
-        <Route path="services" element={<Navigate to="/app" replace />} />
+        <Route
+          path="no-providers"
+          element={<Navigate to="/providers" replace />}
+        />
+        <Route
+          path="services"
+          element={<Navigate to="/app" replace />}
+        />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>

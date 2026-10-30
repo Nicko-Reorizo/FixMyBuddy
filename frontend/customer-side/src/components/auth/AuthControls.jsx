@@ -3,6 +3,8 @@ import { useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { ArrowRight, Eye, EyeOff, LoaderCircle, LockKeyhole, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { PolicyDocument } from '../PolicyDocument';
+import { useLocale } from '../../context/useLocale';
 export function AuthHeading({
   eyebrow,
   title,
@@ -88,29 +90,30 @@ export function AccountLink({
 }
 export function LegalLinks() {
   const dialog = useRef(null);
-  const [policy, setPolicy] = useState('');
-  function link(label, url) {
+  const [policy, setPolicy] = useState('terms');
+  const { t } = useLocale();
+  function link(label, url, kind) {
     return url ? <a href={url} target="_blank" rel="noreferrer">
         {tr(label)}
       </a> : <button type="button" className="auth-inline-link" onClick={() => {
-      setPolicy(label);
+      setPolicy(kind);
       dialog.current.showModal();
     }}>
         {tr(label)}
       </button>;
   }
   return <>
-      {link('Terms', import.meta.env.VITE_TERMS_URL)}{tr("and")}{' '}
-      {link('Privacy Policy', import.meta.env.VITE_PRIVACY_URL)}
-      {createPortal(<dialog ref={dialog} className="auth-policy" aria-label={policy || tr("Account policy")}>
-          <div>
-            <h2>{policy}</h2>
+      {link('Terms', import.meta.env.VITE_TERMS_URL, 'terms')}{' '}{tr("and")}{' '}
+      {link('Privacy Policy', import.meta.env.VITE_PRIVACY_URL, 'privacy')}
+      {createPortal(<dialog ref={dialog} className="policy-modal" aria-labelledby="policy-modal-title">
+          <header className="policy-modal-header">
+            <h2 id="policy-modal-title">{policy === 'terms' ? t('Terms of Use','Mga Tuntunin sa Paggamit') : t('Privacy Policy','Patakaran sa Privacy')}</h2>
             <button type="button" onClick={() => dialog.current.close()} aria-label={tr("Close policy")} title={tr("Close")}>
               <X size={21} />
             </button>
-          </div>
-          <p>{tr("This document is not available yet. Please review the published policy before creating your account.")}</p>
-          <button type="button" className="auth-secondary" onClick={() => dialog.current.close()}>{tr("Close")}</button>
+          </header>
+          <div className="policy-modal-body" key={policy}><PolicyDocument kind={policy} /></div>
+          <footer className="policy-modal-footer"><button type="button" className="auth-secondary" onClick={() => dialog.current.close()}>{tr("Close")}</button></footer>
         </dialog>, document.body)}
     </>;
 }

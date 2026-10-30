@@ -33,11 +33,14 @@ import { RequestMatching } from '../pages/RequestMatching';
 import { TowingRequest } from '../pages/TowingRequest';
 import { ActiveService } from '../pages/ActiveService';
 import { ProviderChat } from '../pages/ProviderChat';
+import { PolicyPage } from '../pages/PolicyPage';
 
 export function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
+      <Route path="terms" element={<PolicyPage kind="terms" />} />
+      <Route path="privacy" element={<PolicyPage kind="privacy" />} />
       <Route path="start" element={<Navigate to="/" replace />} />
       <Route element={<AuthLayout />}>
         <Route path="login" element={<SignIn />} />

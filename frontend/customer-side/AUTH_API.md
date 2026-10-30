@@ -66,3 +66,7 @@ a live map or actual provider. Generated with the built-in image-generation tool
 the Philippines, yellow service pickup and navy scooter, mechanic and rider,
 tropical roadside, muted mint/blue-gray landscape, navy and yellow accents,
 no text, no labels, no logos, no simulated live map."
+
+## Draft policy content
+Default Terms and Privacy links now show bilingual in-app documents and preserve the current form. Public routes /terms and /privacy are also available. VITE_TERMS_URL and VITE_PRIVACY_URL may still point to reviewed, externally published documents. Current local content is explicitly draft and not effective. Operator name supplied by the team: FixMyBuddy. Legal operator identity, privacy email, retention periods, processing bases and recipients, and final service terms still require confirmation before public use. Acknowledging a privacy notice is separate from optional GPS, notification and per-booking sharing choices. Production acceptance should record the actual published policy version and timestamp server-side; the existing acceptedTerms field has not been changed into a simulated acceptance ledger.
+

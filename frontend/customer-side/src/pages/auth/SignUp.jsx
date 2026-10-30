@@ -6,7 +6,9 @@ import { AccountLink, AuthField, AuthHeading, AuthNotice, AuthSubmit, LegalLinks
 import { useAuth } from '../../context/useAuth';
 import { authService } from '../../services/authService';
 import { isEmail, normalizePhone } from '../../utils/authValidation';
+import { useLocale } from '../../context/useLocale';
 export function SignUp() {
+  const { t } = useLocale();
   const [errors, setErrors] = useState({});
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
@@ -29,7 +31,7 @@ export function SignUp() {
     if (!phone) nextErrors.phone = 'Enter a valid Philippine mobile number.';
     if (!isEmail(email)) nextErrors.email = 'Enter a valid email address.';
     if (password.length < 8 || !/[0-9]/.test(password)) nextErrors.password = 'Use at least 8 characters, including a number.';
-    if (!data.get('terms')) nextErrors.terms = 'Please agree to the Terms and Privacy Policy.';
+    if (!data.get('terms')) nextErrors.terms = t('Please agree to the Terms and acknowledge the Privacy Policy.','Sumang-ayon sa Mga Tuntunin at kilalanin ang Patakaran sa Privacy.');
     setErrors(nextErrors);
     setError('');
     if (Object.keys(nextErrors).length) {
@@ -67,9 +69,9 @@ export function SignUp() {
         <PasswordField autoComplete="new-password" error={errors.password} hint={tr("Use at least 8 characters, including a number.")} />
         <div>
           <div className="auth-consent">
-            <input id="terms" type="checkbox" name="terms" aria-label={tr("I agree to the Terms and Privacy Policy")} aria-describedby={errors.terms ? 'terms-error' : undefined} />
+            <input id="terms" type="checkbox" name="terms" aria-label={t('I agree to the Terms and acknowledge the Privacy Policy','Sumasang-ayon ako sa Mga Tuntunin at kinikilala ang Patakaran sa Privacy')} aria-describedby={errors.terms ? 'terms-error' : undefined} />
             <div>
-              <label htmlFor="terms">{tr("I agree to the")}</label>
+              <label htmlFor="terms">{t('I agree to the Terms and acknowledge the Privacy Policy.','Sumasang-ayon ako sa Mga Tuntunin at kinikilala ang Patakaran sa Privacy.')}</label>{' '}
               <LegalLinks />.
             </div>
           </div>

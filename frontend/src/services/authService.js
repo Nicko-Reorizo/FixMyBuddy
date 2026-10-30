@@ -1,4 +1,5 @@
 const baseUrl = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
+import { networkFetch } from '../utils/networkFetch';
 
 export const isAuthConfigured = Boolean(baseUrl);
 
@@ -12,7 +13,7 @@ async function request(path, body, method = 'POST') {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 15000);
   try {
-    const response = await fetch(`${baseUrl}${path}`, {
+    const response = await networkFetch(`${baseUrl}${path}`, {
       method,
       credentials: 'include',
       headers: {
@@ -66,6 +67,7 @@ function userFrom(data) {
 }
 
 export const authService = {
+  async logout() { await request('/auth/logout', {}, 'POST'); },
   async session() {
     const data = await request('/auth/session', null, 'GET');
     return data?.user?.id ? data.user : null;

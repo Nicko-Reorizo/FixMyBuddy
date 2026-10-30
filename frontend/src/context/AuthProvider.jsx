@@ -38,11 +38,17 @@ export function AuthProvider({ children }) {
     setSessionStatus('authenticated');
     setChallenge(null);
   }
+  async function signOut() {
+    await authService.logout();
+    sessionVersion.current += 1;
+    setUser(null); setSessionStatus('guest'); setChallenge(null); setPhone('');
+  }
 
   return (
     <AuthContext.Provider
       value={{
         user,
+        signOut,
         acceptUser,
         challenge,
         setChallenge,

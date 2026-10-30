@@ -2,6 +2,12 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { MainLayout } from '../components/layout/MainLayout';
 import { CustomerLayout } from '../components/customer/CustomerLayout';
 import { Account } from '../pages/Account';
+import { AccountProfile } from '../pages/AccountProfile';
+import { AccountSettings } from '../pages/AccountSettings';
+import { HelpCenter } from '../pages/HelpCenter';
+import { SupportChat } from '../pages/SupportChat';
+import { Disputes } from '../pages/Disputes';
+import { TowingChat } from '../pages/TowingChat';
 import { Vehicles } from '../pages/Vehicles';
 import { Updates } from '../pages/Updates';
 import { PickupLocation } from '../pages/PickupLocation';
@@ -24,6 +30,9 @@ import { Providers } from '../pages/Providers';
 import { RequestAssistance } from '../pages/RequestAssistance';
 import { RequestDetails } from '../pages/RequestDetails';
 import { RequestMatching } from '../pages/RequestMatching';
+import { TowingRequest } from '../pages/TowingRequest';
+import { ActiveService } from '../pages/ActiveService';
+import { ProviderChat } from '../pages/ProviderChat';
 
 export function AppRoutes() {
   return (
@@ -43,12 +52,21 @@ export function AppRoutes() {
         <Route path="app" element={<AppHome />} />
         <Route path="vehicles" element={<Vehicles />} />
         <Route path="account" element={<Account />} />
+        <Route path="account/:section" element={<AccountProfile />} />
+        <Route path="settings/:section" element={<AccountSettings />} />
+        <Route path="help" element={<HelpCenter />} />
+        <Route path="help/chat" element={<SupportChat />} />
+        <Route path="help/disputes" element={<Disputes />} />
+        <Route path="bookings/:bookingId/towing-chat" element={<TowingChat />} />
+        <Route path="bookings/:bookingId/service" element={<ActiveService />} />
+        <Route path="bookings/:bookingId/provider-chat" element={<ProviderChat />} />
         <Route path="updates" element={<Updates />} />
         <Route path="location" element={<PickupLocation />} />
         <Route path="history" element={<History />} />
       </Route>
       <Route element={<MainLayout />}>
         <Route path="request" element={<RequestAssistance />} />
+        <Route path="request/towing" element={<TowingRequest />} />
         <Route path="request/details" element={<RequestDetails />} />
         <Route path="request/matching" element={<RequestMatching />} />
         <Route path="confirm-location" element={<ConfirmLocation />} />

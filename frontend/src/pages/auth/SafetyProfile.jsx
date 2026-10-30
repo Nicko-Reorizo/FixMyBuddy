@@ -1,31 +1,23 @@
+import { tr } from "../../i18n/translations";
 import { useState } from 'react';
 import { Check, Mail, Pencil, Phone, UserRound } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import {
-  AuthField,
-  AuthHeading,
-  AuthNotice,
-  AuthSubmit,
-} from '../../components/auth/AuthControls';
+import { AuthField, AuthHeading, AuthNotice, AuthSubmit } from '../../components/auth/AuthControls';
 import { useAuth } from '../../context/useAuth';
 import { authService } from '../../services/authService';
 import { normalizePhone } from '../../utils/authValidation';
-
 export function SafetyProfile() {
-  const { user, acceptUser, sessionStatus } = useAuth();
+  const {
+    user,
+    acceptUser,
+    sessionStatus
+  } = useAuth();
   const [editing, setEditing] = useState(false);
   const [errors, setErrors] = useState({});
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const navigate = useNavigate();
-  const initials = user?.name
-    ?.trim()
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((part) => part[0])
-    .join('')
-    .toUpperCase();
-
+  const initials = user?.name?.trim().split(/\s+/).slice(0, 2).map(part => part[0]).join('').toUpperCase();
   async function submit(event) {
     event.preventDefault();
     if (busy) return;
@@ -39,32 +31,26 @@ export function SafetyProfile() {
     const relationship = data.get('relationship');
     const nextErrors = {};
     const hasContact = Boolean(name || number || relationship);
-    if (hasContact && name.length < 2)
-      nextErrors.contactName = "Enter your contact's name.";
-    if (hasContact && !normalizePhone(number))
-      nextErrors.contactPhone = 'Enter a valid Philippine mobile number.';
-    if (hasContact && !relationship)
-      nextErrors.relationship = 'Choose a relationship.';
-    if (editing && data.get('name').trim().length < 2)
-      nextErrors.name = 'Enter your full name.';
-    if (
-      normalizePhone(number) &&
-      normalizePhone(number) === normalizePhone(user.phone || '')
-    )
-      nextErrors.contactPhone = 'Choose someone other than yourself.';
+    if (hasContact && name.length < 2) nextErrors.contactName = "Enter your contact's name.";
+    if (hasContact && !normalizePhone(number)) nextErrors.contactPhone = 'Enter a valid Philippine mobile number.';
+    if (hasContact && !relationship) nextErrors.relationship = 'Choose a relationship.';
+    if (editing && data.get('name').trim().length < 2) nextErrors.name = 'Enter your full name.';
+    if (normalizePhone(number) && normalizePhone(number) === normalizePhone(user.phone || '')) nextErrors.contactPhone = 'Choose someone other than yourself.';
     setErrors(nextErrors);
     setError('');
     if (Object.keys(nextErrors).length) return;
     setBusy(true);
     try {
-      acceptUser(
-        await authService.profile({
-          ...(editing ? { name: data.get('name').trim() } : {}),
-          emergencyContact: hasContact
-            ? { name, phone: normalizePhone(number), relationship }
-            : null,
-        }),
-      );
+      acceptUser(await authService.profile({
+        ...(editing ? {
+          name: data.get('name').trim()
+        } : {}),
+        emergencyContact: hasContact ? {
+          name,
+          phone: normalizePhone(number),
+          relationship
+        } : null
+      }));
       navigate('/app');
     } catch (failure) {
       setError(failure.message);
@@ -72,130 +58,61 @@ export function SafetyProfile() {
       setBusy(false);
     }
   }
-
-  if (sessionStatus === 'loading')
-    return <AuthNotice>Loading your account...</AuthNotice>;
-
-  return (
-    <div className="auth-page">
-      <AuthHeading title="Your safety circle.">
-        Your account and someone you trust.
-      </AuthHeading>
+  if (sessionStatus === 'loading') return <AuthNotice>{tr("Loading your account...")}</AuthNotice>;
+  return <div className="auth-page">
+      <AuthHeading title={tr("Your safety circle.")}>{tr("Your account and someone you trust.")}</AuthHeading>
       <form onSubmit={submit} className="auth-form">
         <div className="auth-profile-person">
           <span>{initials || <UserRound size={24} />}</span>
           <div>
-            <h3>{user?.name || 'Your customer profile'}</h3>
+            <h3>{user?.name || tr("Your customer profile")}</h3>
             <p>
-              {user?.phoneVerified
-                ? 'Customer \u00b7 Phone verified'
-                : user
-                  ? 'Customer account'
-                  : 'Sign in to save your details'}
+              {user?.phoneVerified ? tr("Customer \xB7 Phone verified") : user ? tr("Customer account") : tr("Sign in to save your details")}
             </p>
           </div>
         </div>
         <div className="auth-profile-details">
           <div>
             <Phone size={18} />
-            <span>Mobile</span>
-            <strong>{user?.phone || 'Not provided'}</strong>
+            <span>{tr("Mobile")}</span>
+            <strong>{user?.phone || tr("Not provided")}</strong>
           </div>
           <div>
             <Mail size={18} />
-            <span>Email</span>
-            <strong>{user?.email || 'Not provided'}</strong>
+            <span>{tr("Email")}</span>
+            <strong>{user?.email || tr("Not provided")}</strong>
           </div>
-          {user && (
-            <div>
+          {user && <div>
               <Pencil size={18} />
-              <span>Account details</span>
+              <span>{tr("Account details")}</span>
               <button type="button" onClick={() => setEditing(!editing)}>
-                {editing ? 'Cancel edit' : 'Edit profile'}
+                {editing ? tr("Cancel edit") : tr("Edit profile")}
               </button>
-            </div>
-          )}
+            </div>}
         </div>
-        {editing && (
-          <AuthField
-            id="profile-name"
-            name="name"
-            label="Full name"
-            autoComplete="name"
-            defaultValue={user?.name || ''}
-            error={errors.name}
-            required
-            icon={UserRound}
-          />
-        )}
+        {editing && <AuthField id="profile-name" name="name" label={tr("Full name")} autoComplete="name" defaultValue={user?.name || ''} error={errors.name} required icon={UserRound} />}
         <div className="auth-section-title">
-          <h3>Emergency contact</h3>
-          <span>Optional</span>
+          <h3>{tr("Emergency contact")}</h3>
+          <span>{tr("Optional")}</span>
         </div>
-        <AuthField
-          id="contact-name"
-          name="contactName"
-          label="Contact name"
-          defaultValue={user?.emergencyContact?.name || ''}
-          maxLength={100}
-          icon={UserRound}
-          error={errors.contactName}
-        />
+        <AuthField id="contact-name" name="contactName" label={tr("Contact name")} defaultValue={user?.emergencyContact?.name || ''} maxLength={100} icon={UserRound} error={errors.contactName} />
         <div className="auth-field">
-          <label htmlFor="relationship">Relationship</label>
-          <select
-            id="relationship"
-            name="relationship"
-            defaultValue={user?.emergencyContact?.relationship || ''}
-            aria-invalid={Boolean(errors.relationship)}
-            aria-describedby={
-              errors.relationship ? 'relationship-error' : undefined
-            }
-          >
-            <option value="">Choose a relationship</option>
-            {['Parent', 'Spouse or partner', 'Sibling', 'Friend', 'Other'].map(
-              (value) => (
-                <option key={value}>{value}</option>
-              ),
-            )}
+          <label htmlFor="relationship">{tr("Relationship")}</label>
+          <select id="relationship" name="relationship" defaultValue={user?.emergencyContact?.relationship || ''} aria-invalid={Boolean(errors.relationship)} aria-describedby={errors.relationship ? 'relationship-error' : undefined}>
+            <option value="">{tr("Choose a relationship")}</option>
+            {['Parent', 'Spouse or partner', 'Sibling', 'Friend', 'Other'].map(value => <option key={value}>{value}</option>)}
           </select>
-          {errors.relationship && (
-            <p id="relationship-error" className="auth-field-error">
+          {errors.relationship && <p id="relationship-error" className="auth-field-error">
               {errors.relationship}
-            </p>
-          )}
+            </p>}
         </div>
-        <AuthField
-          id="contact-phone"
-          name="contactPhone"
-          label="Contact number"
-          type="tel"
-          inputMode="tel"
-          placeholder="09XX XXX XXXX"
-          defaultValue={user?.emergencyContact?.phone || ''}
-          icon={Phone}
-          error={errors.contactPhone}
-        />
-        <AuthNotice>
-          Choose someone you trust and ask for their permission before adding
-          their contact details.
-        </AuthNotice>
-        {error && <AuthNotice error>{error}</AuthNotice>}
+        <AuthField id="contact-phone" name="contactPhone" label={tr("Contact number")} type="tel" inputMode="tel" placeholder={tr("09XX XXX XXXX")} defaultValue={user?.emergencyContact?.phone || ''} icon={Phone} error={errors.contactPhone} />
+        <AuthNotice>{tr("Choose someone you trust and ask for their permission before adding their contact details.")}</AuthNotice>
+        {error && <AuthNotice error>{tr(error)}</AuthNotice>}
         <div className="auth-actions">
-          {user ? (
-            <AuthSubmit busy={busy} icon={Check}>
-              Save profile & contact
-            </AuthSubmit>
-          ) : (
-            <Link className="auth-primary" to="/login">
-              Sign in to save details
-            </Link>
-          )}
-          <Link to="/app" className="auth-secondary">
-            Skip for now
-          </Link>
+          {user ? <AuthSubmit busy={busy} icon={Check}>{tr("Save profile & contact")}</AuthSubmit> : <Link className="auth-primary" to="/login">{tr("Sign in to save details")}</Link>}
+          <Link to="/app" className="auth-secondary">{tr("Skip for now")}</Link>
         </div>
       </form>
-    </div>
-  );
+    </div>;
 }

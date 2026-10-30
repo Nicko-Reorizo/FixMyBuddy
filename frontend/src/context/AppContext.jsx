@@ -3,6 +3,8 @@ import { customerService } from '../services/customerService';
 import { AppContext } from './appContextValue';
 import { validateSchedule } from '../utils/vehicleValidation';
 import { defaultProviderFilters, validEstimate } from '../utils/bookingValidation';
+import { validTowingCondition, validTowingQuote } from '../utils/towingValidation';
+import { validateTowingDestination } from '../utils/towingDestination';
 
 const defaultLocation = {
   latitude: null,
@@ -18,6 +20,9 @@ const defaultRequest = {
   photoName: '',
   notes: '',
   destination: '',
+  destinationMode: 'manual',
+  destinationShop: null,
+  towingCondition: {},
   landmark: '',
   matchingMode: 'manual',
   searchRadiusKm: 5,
@@ -89,6 +94,10 @@ export function AppProvider({ children }) {
   );
 
   const confirmRequest = async (approval) => {
+    if (request.serviceType === 'towing' && validateTowingDestination(request, location)) throw new Error(validateTowingDestination(request, location));
+    if (request.serviceType === 'towing' && (!validTowingCondition(request.towingCondition) || !validTowingQuote(selectedProvider?.towingQuote) || request.destination.trim().length < 5)) {
+      throw new Error('Confirm your towing destination, vehicle condition and provider route before booking.');
+    }
     if (!validEstimate(selectedProvider?.estimate) || !selectedProvider?.cancellationPolicy?.id || !selectedProvider.cancellationPolicy.text) {
       throw new Error('A current estimate and cancellation terms are required before booking.');
     }
@@ -116,6 +125,7 @@ export function AppProvider({ children }) {
       cancellationPolicyId: selectedProvider.cancellationPolicy.id,
       paymentMethod: 'provider_qr',
       repairsApproved: false,
+      ...(request.serviceType === 'towing' ? { towingRouteId: selectedProvider.towingQuote.routeId, towingRouteVersion: selectedProvider.towingQuote.version } : {}),
     });
     resetRequest(request.serviceType);
     return booking;

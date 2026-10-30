@@ -9,7 +9,7 @@ export function validateVehicle(vehicle, vehicles = [], editingId = null) {
   const errors = {};
   if (!['car', 'motorcycle'].includes(vehicle.type))
     errors.type = 'Choose a vehicle type.';
-  if (!vehicle.make?.trim()) errors.make = 'Enter the make.';
+  if (!vehicle.make?.trim()) errors.make = 'Enter the vehicle brand.';
   if (!vehicle.model?.trim()) errors.model = 'Enter the model.';
   const year = Number(vehicle.year);
   if (

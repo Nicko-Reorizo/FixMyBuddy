@@ -658,7 +658,7 @@
   .auth-policy h2 {
     @apply text-xl font-bold;
   }
-  .auth-policy > div button {
+  .auth-policy > div button:not(.auth-primary):not(.auth-secondary) {
     @apply grid h-11 w-11 place-items-center;
   }
   .auth-policy p {
@@ -1351,6 +1351,12 @@
   }
   .customer-remove-actions {
     @apply flex flex-col gap-2;
+  }
+  .auth-policy > .customer-remove-actions {
+    @apply items-stretch;
+  }
+  .customer-remove-actions > button {
+    @apply h-auto w-full whitespace-nowrap;
   }
   .customer-save-status {
     @apply mt-2 text-base leading-6 text-[rgb(var(--fmb-success))];

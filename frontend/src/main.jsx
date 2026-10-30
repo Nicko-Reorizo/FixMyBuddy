@@ -10,6 +10,8 @@ import { LocaleProvider } from './context/LocaleProvider.jsx';
 import { ThemeProvider } from './context/ThemeProvider.jsx';
 import './styles/theme.css';
 import './styles/welcome.css';
+import './styles/location-picker.css';
+import './styles/brand.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

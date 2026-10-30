@@ -165,3 +165,7 @@ Separate repairs use `repairApprovalStatus: 'awaiting_customer'` and a valid `re
 
 For isolated browser QA only: `node tests/provider-preview.mjs` starts a test API at 5984 and Vite at 5184. Its explicitly named test records live only in that process, on a separate origin, and are never imported by the application or enabled by npm run dev/build. Stop the process after testing; never deploy it as a backend. No real payments or bookings occur there.
 
+
+### Pickup map and address lookup
+The customer pickup preview opens a full-screen Leaflet picker. Panning changes a local draft; Back/Escape leaves the confirmed pickup unchanged. Confirm saves the pin, editable address, and optional request landmark. GPS requests also reverse-geocode the returned coordinates. Address suggestions use Photon-compatible GET /reverse?lat=...&lon=...&limit=1&lang=en (GeoJSON features[].properties). Set VITE_GEOCODER_URL to your hosted Photon service or compatible proxy for production; the default public Photon server has reasonable-use limits and no availability guarantee (https://github.com/komoot/photon#demo-server). Only coordinates are sent to this service; typed addresses, landmarks, and account details are not. Lookups are debounced after map movement, time out after eight seconds, and use a bounded in-memory cache. Map tiles use OpenStreetMap attribution. Address results are approximate and remain customer-editable; failed lookups preserve the pin and allow manual entry. No provider positions or routes are fabricated.
+

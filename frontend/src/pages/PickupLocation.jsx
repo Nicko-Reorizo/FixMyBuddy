@@ -1,5 +1,5 @@
 import { tr } from "../i18n/translations";
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Check, LocateFixed } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AuthField, AuthNotice } from '../components/auth/AuthControls';
@@ -19,6 +19,7 @@ export function PickupLocation() {
   } = useGeolocation();
   const [address, setAddress] = useState(location.address === 'Use current location' ? '' : location.address);
   const [error, setError] = useState('');
+  useEffect(() => { setAddress(location.address === 'Use current location' ? '' : location.address); }, [location.address]);
   const navigate = useNavigate();
   async function locate() {
     const next = await requestLocation();

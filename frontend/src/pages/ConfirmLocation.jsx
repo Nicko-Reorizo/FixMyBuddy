@@ -1,5 +1,5 @@
 import { tr, trTemplate } from "../i18n/translations";
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { MapPin, LocateFixed, ArrowRight } from 'lucide-react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { RequestFrame } from '../components/app/RequestFrame';
@@ -28,6 +28,10 @@ export function ConfirmLocation() {
   const [latitude, setLatitude] = useState(location.latitude ?? '');
   const [longitude, setLongitude] = useState(location.longitude ?? '');
   const [error, setError] = useState('');
+  useEffect(() => {
+    setAddress(location.address === 'Use current location' ? '' : location.address);
+    setLatitude(location.latitude ?? ''); setLongitude(location.longitude ?? '');
+  }, [location.address, location.latitude, location.longitude]);
   const navigate = useNavigate();
   const hasCoordinates = Number.isFinite(location.latitude) && Number.isFinite(location.longitude);
   if (vehicleStatus === 'loading') return <RequestFrame title={tr("Your vehicle")} subtitle={tr("Loading...")} />;

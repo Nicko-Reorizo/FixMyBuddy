@@ -1,6 +1,7 @@
 import { tr, trTemplate } from "../../i18n/translations";
 import { useEffect } from 'react';
-import { ArrowLeft, ArrowUpRight, Wrench } from 'lucide-react';
+import { ArrowLeft, ArrowUpRight } from 'lucide-react';
+import { BrandLogo } from '../BrandLogo';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 const steps = ['/signup', '/verify', '/permissions', '/profile'];
 const titles = {
@@ -37,9 +38,7 @@ export function AuthLayout() {
       <a href="#auth-main" className="auth-skip">{tr("Skip to form")}</a>
       <header className="auth-nav">
         <Link to="/" className="auth-brand" aria-label={tr("FixMyBuddy home")}>
-          <span className="auth-brand-icon">
-            <Wrench size={21} />
-          </span>
+          <BrandLogo />
           <span>{tr("FixMyBuddy")}<span className="auth-brand-caption">{tr("YOUR ROADSIDE BUDDY")}</span>
           </span>
         </Link>
@@ -63,7 +62,7 @@ export function AuthLayout() {
             <Outlet />
           </div>
           <footer className="auth-footer">
-            <Wrench size={13} />{tr("FixMyBuddy")} {' '}
+            <BrandLogo />{tr("FixMyBuddy")} {' '}
             <span>{tr("Here for your next move.")}</span>
           </footer>
         </main>

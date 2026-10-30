@@ -63,6 +63,7 @@ export function AppHome() {
     resetRequest(service);
     updateRequest({
       vehicleId: selectedVehicle?.id || '',
+      landmark: location.landmark || '',
       scheduledAt: timing === 'scheduled' ? new Date(selectedTime).toISOString() : null
     });
     navigate(selectedVehicle ? service === 'towing' ? '/request/towing' : '/request?service=mechanic' : `/vehicles?continue=${service}`);
@@ -73,7 +74,7 @@ export function AppHome() {
         <Link to="/location">
           <MapPin size={19} />
           <span>
-            {gpsActive ? location.address : location.source === 'Manual address' ? location.address : tr("Set your pickup location")}
+            {location.address && location.address !== 'Use current location' ? location.address : tr("Set your pickup location")}
           </span>
         </Link>
         <button type="button" onClick={locate} disabled={status === 'loading'}>

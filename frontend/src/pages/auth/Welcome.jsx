@@ -1,23 +1,41 @@
 import { tr } from "../../i18n/translations";
-import { useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { ArrowRight, LocateFixed, LoaderCircle, MapPin, Navigation, ReceiptText, ShieldCheck, Wrench, Truck, Bike, CarFront, ChevronDown, Sun, Moon, MessageCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useApp } from '../../context/useApp';
 import { useLocale } from '../../context/useLocale';
 import { useTheme } from '../../context/useTheme';
+import { lookupAddress } from '../../services/locationService';
+import { hasStreetAddress, validCoordinates } from '../../utils/locationAddress';
+import { BrandLogo } from '../../components/BrandLogo';
+const LocationPicker = lazy(() => import('../../components/customer/LocationPicker').then(module => ({ default: module.LocationPicker })));
 export function PickupPreview({
   onLocate,
   locating = false,
   compact = false
 }) {
   const {
-    location
+    location, setLocation
   } = useApp();
-  const hasLocation = Number.isFinite(location.latitude) && Number.isFinite(location.longitude);
-  const bounds = hasLocation ? [location.longitude - 0.008, location.latitude - 0.008, location.longitude + 0.008, location.latitude + 0.008].join(',') : '';
+  const { t } = useLocale();
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [finding, setFinding] = useState(false);
+  const hasLocation = validCoordinates(location);
+  const needsAddress = hasLocation && !hasStreetAddress(location.address);
+  useEffect(() => {
+    if (!needsAddress) return;
+    let active = true;
+    setFinding(true);
+    const point = { latitude: location.latitude, longitude: location.longitude };
+    lookupAddress(point).then(address => {
+      if (active) setLocation(current => current.latitude === point.latitude && current.longitude === point.longitude && !hasStreetAddress(current.address) ? { ...current, address } : current);
+    }).catch(() => {}).finally(() => { if (active) setFinding(false); });
+    return () => { active = false; };
+  }, [needsAddress, location.latitude, location.longitude, setLocation]);
+  const bounds = hasLocation ? [location.longitude - 0.002, location.latitude - 0.002, location.longitude + 0.002, location.latitude + 0.002].join(',') : '';
   return <figure className="landing-map">
       <div className="landing-map-canvas">
-        {hasLocation ? <iframe title={tr("Your selected pickup location")} src={`https://www.openstreetmap.org/export/embed.html?bbox=${bounds}&layer=mapnik&marker=${location.latitude},${location.longitude}`} loading="lazy" referrerPolicy="no-referrer" /> : <div className="landing-map-art" role="img" aria-label={tr("Illustrative street map. No pickup location or provider has been selected.")}>
+        {hasLocation ? <iframe title={tr("Your selected pickup location")} tabIndex={-1} src={`https://www.openstreetmap.org/export/embed.html?bbox=${bounds}&layer=mapnik&marker=${location.latitude},${location.longitude}`} loading="lazy" referrerPolicy="no-referrer" /> : <div className="landing-map-art" role="img" aria-label={tr("Illustrative street map. No pickup location or provider has been selected.")}>
             <span className="map-park map-park-one" />
             <span className="map-park map-park-two" />
             <span className="map-block map-block-one" />
@@ -32,12 +50,14 @@ export function PickupPreview({
               <MapPin size={25} />
             </span>
           </div>}
-        {!hasLocation && <span className="landing-map-badge">
-            <MapPin size={13} />{tr("Your journey starts here")}</span>}
+        <button type="button" className="landing-map-open" onClick={() => setPickerOpen(true)} aria-label={t('Open full-screen pickup map','Buksan ang buong pickup map')}><span><MapPin size={17} />{t('Tap to adjust pin','Pindutin para baguhin ang pin')}</span></button>
         {onLocate && <button type="button" className="customer-map-locate" onClick={onLocate} disabled={locating} aria-label={tr("Use my current location")} title={tr("Use my current location")}>
             {locating ? <LoaderCircle size={21} className="auth-spin" /> : <LocateFixed size={21} />}
           </button>}
       </div>
+      {hasLocation && <div className="landing-map-credit">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap contributors</a></div>}
+      {hasLocation && <div className="landing-map-address" aria-live="polite"><strong>{t('Your pickup address','Pickup address mo')}</strong><p>{finding && needsAddress ? t('Finding address...','Hinahanap ang address...') : hasStreetAddress(location.address) ? location.address : t('Address unavailable. Tap the map to enter your address.','Hindi makuha ang address. Pindutin ang mapa para ilagay ang address.')}</p></div>}
+      {pickerOpen && <Suspense fallback={<p role="status">{t('Opening map...','Binubuksan ang mapa...')}</p>}><LocationPicker onClose={() => setPickerOpen(false)} /></Suspense>}
       {!compact && <figcaption>
           <Navigation size={15} />
           <span>
@@ -76,7 +96,7 @@ export function Welcome() {
   return <main className="auth-root welcome-page" ref={page}>
     <a className="auth-skip" href="#welcome-main">{t('Skip to content','Pumunta sa nilalaman')}</a>
     <header className="welcome-header welcome-wrap">
-      <Link className="auth-brand" to="/" aria-label="FixMyBuddy home" onClick={() => window.scrollTo(0, 0)}><span className="auth-brand-icon"><Wrench size={23} /></span><span>FixMyBuddy</span></Link>
+      <Link className="auth-brand" to="/" aria-label="FixMyBuddy home" onClick={() => window.scrollTo(0, 0)}><BrandLogo /><span>FixMyBuddy</span></Link>
       <nav aria-label={t('Main navigation','Pangunahing nabigasyon')}><a className="welcome-nav-guide" href="#how-it-works">{t('How it works','Paano ito gumagana')}</a><button className="welcome-theme" type="button" onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')} aria-label={resolvedTheme === 'dark' ? t('Switch to light mode','Gawing maliwanag ang hitsura') : t('Switch to dark mode','Gawing madilim ang hitsura')}>{resolvedTheme === 'dark' ? <Sun size={21} /> : <Moon size={21} />}</button><Link className="welcome-signin" to="/login">{t('Sign in','Mag-sign in')}</Link></nav>
     </header>
 
@@ -129,6 +149,6 @@ export function Welcome() {
     ].map(([question,answer]) => <details key={question}><summary>{question}<ChevronDown size={21} /></summary><p>{answer}</p></details>)}</div></section>
 
     <div className="welcome-wrap"><section className="welcome-last-call welcome-reveal"><span className="welcome-cta-mark" aria-hidden="true"><Wrench size={48} /></span><div><p className="welcome-eyebrow">{t('FOR WHATEVER THE ROAD HAS PLANNED.','ANUMAN ANG DALHIN NG DAAN.')}</p><h2>{t('Meet your new','Kilalanin ang bago mong')}<br />{t('roadside buddy.','roadside buddy.')}</h2></div><div className="welcome-final-actions"><Link to="/signup">{t('Let’s get you ready','Maghanda na tayo')}<ArrowRight size={23} /></Link><Link className="welcome-browse" to="/app">{t('Or take a look around first','O tingnan muna ang app')}</Link></div></section></div>
-    <footer className="welcome-footer welcome-wrap"><div><Link className="auth-brand" to="/" onClick={() => window.scrollTo(0, 0)}><Wrench size={23} />FixMyBuddy</Link><p>{t('When your ride stops, we get you moving.','Kapag huminto ang biyahe, tutulungan ka naming muli.')}</p></div><nav aria-label={t('Footer navigation','Mga link sa ibaba')}><a href="#how-it-works">{t('How it works','Paano ito gumagana')}</a><Link to="/login">{t('Sign in','Mag-sign in')}</Link><Link to="/help">{t('Help & support','Tulong at suporta')}</Link>{providerPortal && <a href={providerPortal}>{t('Join FixMyBuddy Pro','Sumali sa FixMyBuddy Pro')}</a>}</nav></footer>
+    <footer className="welcome-footer welcome-wrap"><div><Link className="auth-brand" to="/" onClick={() => window.scrollTo(0, 0)}><BrandLogo />FixMyBuddy</Link><p>{t('When your ride stops, we get you moving.','Kapag huminto ang biyahe, tutulungan ka naming muli.')}</p></div><nav aria-label={t('Footer navigation','Mga link sa ibaba')}><a href="#how-it-works">{t('How it works','Paano ito gumagana')}</a><Link to="/login">{t('Sign in','Mag-sign in')}</Link><Link to="/help">{t('Help & support','Tulong at suporta')}</Link>{providerPortal && <a href={providerPortal}>{t('Join FixMyBuddy Pro','Sumali sa FixMyBuddy Pro')}</a>}</nav></footer>
   </main>;
 }

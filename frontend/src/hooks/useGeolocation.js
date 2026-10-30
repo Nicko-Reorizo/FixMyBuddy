@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react';
+import { lookupAddress } from '../services/locationService';
 
 export function useGeolocation() {
   const [status, setStatus] = useState('idle');
@@ -15,17 +16,20 @@ export function useGeolocation() {
 
     return new Promise((resolve) => {
       navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setStatus('ready');
-          setError('');
-          resolve({
+        async (position) => {
+          const next = {
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
             accuracy: position.coords.accuracy,
             updatedAt: new Date(position.timestamp).toISOString(),
             address: 'Current GPS location',
             source: 'GPS active',
-          });
+          };
+          try { next.address = await lookupAddress(next); }
+          catch { next.addressLookupFailed = true; }
+          setStatus('ready');
+          setError('');
+          resolve(next);
         },
         () => {
           setStatus('error');

@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
-import { Bell, History, House, UserRound, Wrench } from 'lucide-react';
+import { Bell, History, House, UserRound } from 'lucide-react';
+import { BrandLogo } from '../BrandLogo';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { useLocale } from '../../context/useLocale';
 
@@ -39,9 +40,7 @@ export function CustomerLayout() {
             className="auth-brand"
             aria-label="FixMyBuddy customer home"
           >
-            <span className="auth-brand-icon">
-              <Wrench size={21} />
-            </span>
+            <BrandLogo />
             <span>FixMyBuddy</span>
           </Link>
           <span className="auth-customer-tag">ROADSIDE</span>

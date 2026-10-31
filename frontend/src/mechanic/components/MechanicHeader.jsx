@@ -4,12 +4,13 @@ export function MechanicHeader({
   title,
   subtitle,
   showBack = false,
+  showBrand = true,
   onBack,
   badge = 'PRO',
 }) {
   return (
     <header className="mb-5">
-      <div className="flex min-h-11 items-center gap-3">
+      {showBrand && <div className="flex min-h-11 items-center gap-3">
         {showBack ? (
           <button
             type="button"
@@ -34,10 +35,10 @@ export function MechanicHeader({
             {badge}
           </span>
         )}
-      </div>
+      </div>}
 
       {(title || subtitle) && (
-        <div className="mt-4">
+        <div className={showBrand ? 'mt-4' : 'mt-0'}>
           {title && (
             <h1 className="m-0 text-[22px] font-bold leading-7 tracking-tight">
               {title}

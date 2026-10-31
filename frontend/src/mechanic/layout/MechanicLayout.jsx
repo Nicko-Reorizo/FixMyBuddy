@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
-import { NavLink, Outlet, useLocation } from 'react-router-dom';
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
+  ArrowLeft,
   Bell,
   BriefcaseBusiness,
   CircleUserRound,
@@ -32,6 +33,7 @@ const navigationItems = [
 ];
 
 function getPageTitle(pathname) {
+  if (pathname.includes('/additional-work')) return 'Request additional work';
   if (pathname.includes('/arrival')) return 'Verify arrival';
   if (pathname.includes('/diagnosis')) return 'Record diagnosis';
   if (pathname.includes('/quote')) return 'Repair quote';
@@ -49,6 +51,13 @@ function getPageTitle(pathname) {
 
 export function MechanicLayout() {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
+  const isJobOffer = /^\/mechanic\/jobs\/[^/]+$/.test(pathname);
+  const showBack =
+    isJobOffer ||
+    pathname.endsWith('/quote') ||
+    pathname.endsWith('/additional-work');
+  const isJobDetail = /^\/mechanic\/jobs\/[^/]+(?:\/.*)?$/.test(pathname);
 
   useEffect(() => {
     document.title = `${getPageTitle(pathname)} | FixMyBuddy Pro`;
@@ -57,15 +66,26 @@ export function MechanicLayout() {
 
   return (
     <div className="min-h-dvh bg-[#090f1e] text-white">
-      <div className="mx-auto flex min-h-dvh w-full max-w-[430px] flex-col border-x border-white/5 bg-[#10192d]">
+      <div className="mx-auto flex min-h-dvh w-full max-w-[488px] flex-col border-x border-white/5 bg-[#10192d]">
         <header className="flex h-[72px] shrink-0 items-center justify-between px-5">
           <div className="flex items-center gap-3">
-            <span
-              aria-hidden="true"
-              className="grid h-9 w-9 place-items-center rounded-xl bg-[#1c293d] text-[#ffda45]"
-            >
-              <Wrench size={19} strokeWidth={2.2} />
-            </span>
+            {showBack ? (
+              <button
+                type="button"
+                onClick={() => navigate(-1)}
+                aria-label="Go back"
+                className="grid h-9 w-9 place-items-center rounded-xl bg-[#1c293d] text-[#ffda45]"
+              >
+                <ArrowLeft size={19} />
+              </button>
+            ) : (
+              <span
+                aria-hidden="true"
+                className="grid h-9 w-9 place-items-center rounded-xl bg-[#1c293d] text-[#ffda45]"
+              >
+                <Wrench size={19} strokeWidth={2.2} />
+              </span>
+            )}
             <span className="text-sm font-medium tracking-wide">
               FixMyBuddy
             </span>
@@ -80,28 +100,30 @@ export function MechanicLayout() {
           <Outlet />
         </main>
 
-        <nav
-          aria-label="Mechanic navigation"
-          className="sticky bottom-0 z-10 grid grid-cols-4 border-t border-[#26354d] bg-[#17243a] px-2 pb-2 pt-2"
-        >
-          {navigationItems.map(({ label, to, icon: Icon }) => (
-            <NavLink
-              key={to}
-              to={to}
-              className={({ isActive }) =>
-                [
-                  'flex min-h-[52px] flex-col items-center justify-center gap-1 rounded-xl text-[10px] transition-colors',
-                  isActive
-                    ? 'bg-[#24364d] font-semibold text-[#ffda45]'
-                    : 'text-[#aebbd0] hover:text-white',
-                ].join(' ')
-              }
-            >
-              <Icon size={19} strokeWidth={1.9} aria-hidden="true" />
-              <span>{label}</span>
-            </NavLink>
-          ))}
-        </nav>
+        {!isJobDetail && (
+          <nav
+            aria-label="Mechanic navigation"
+            className="sticky bottom-0 z-10 grid grid-cols-4 border-t border-[#26354d] bg-[#17243a] px-2 pb-2 pt-2"
+          >
+            {navigationItems.map(({ label, to, icon: Icon }) => (
+              <NavLink
+                key={to}
+                to={to}
+                className={({ isActive }) =>
+                  [
+                    'flex min-h-[52px] flex-col items-center justify-center gap-1 rounded-xl text-[10px] transition-colors',
+                    isActive
+                      ? 'bg-[#24364d] font-semibold text-[#ffda45]'
+                      : 'text-[#aebbd0] hover:text-white',
+                  ].join(' ')
+                }
+              >
+                <Icon size={19} strokeWidth={1.9} aria-hidden="true" />
+                <span>{label}</span>
+              </NavLink>
+            ))}
+          </nav>
+        )}
       </div>
     </div>
   );

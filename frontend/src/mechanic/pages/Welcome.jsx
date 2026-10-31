@@ -4,8 +4,9 @@ import { MechanicHeader } from '../components/MechanicHeader';
 
 export function Welcome() {
   return (
-    <div className="flex min-h-[calc(100dvh-160px)] flex-col">
-      <MechanicHeader />
+    <div className="mechanic-public-shell">
+      <div className="mechanic-public-page">
+        <MechanicHeader />
 
       <section className="mt-4">
         <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[#ffda45]">
@@ -79,7 +80,7 @@ export function Welcome() {
         </li>
       </ul>
 
-      <div className="mt-auto flex flex-col gap-3 pt-8">
+        <div className="mt-auto flex flex-col gap-3 pt-8">
         <Link
           to="/mechanic/sign-in"
           className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[#ffda45] px-4 text-sm font-bold text-[#111827]"
@@ -93,6 +94,7 @@ export function Welcome() {
         >
           Sign in to Pro
         </Link>
+        </div>
       </div>
     </div>
   );

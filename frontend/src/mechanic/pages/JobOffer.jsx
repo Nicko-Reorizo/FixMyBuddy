@@ -1,8 +1,8 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import {
-  ArrowLeft,
   ArrowRight,
   CarFront,
+  ChevronDown,
   MapPin,
   Wrench,
 } from 'lucide-react';
@@ -35,21 +35,11 @@ export function JobOffer() {
 
   return (
     <div className="pb-4">
-      <div className="mb-4 flex items-center gap-3">
-        <button
-          type="button"
-          onClick={() => navigate(-1)}
-          aria-label="Go back"
-          className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#1c293d] text-[#ffda45]"
-        >
-          <ArrowLeft size={20} />
-        </button>
-        <div>
-          <h1 className="m-0 text-xl font-bold">New job offer</h1>
-          <p className="mb-0 mt-1 text-xs text-[#aebbd0]">
-            {jobId || job.id} · Battery · Request expires in 00:42
-          </p>
-        </div>
+      <div className="mb-4">
+        <h1 className="m-0 text-xl font-bold">New job offer</h1>
+        <p className="mb-0 mt-1 text-xs text-[#aebbd0]">
+          {jobId || job.id} · Battery · Request expires in 00:42
+        </p>
       </div>
 
       <section className="mb-4 flex items-center gap-3">
@@ -64,78 +54,76 @@ export function JobOffer() {
         </div>
       </section>
 
-      <section className="mb-3 flex items-center gap-3 rounded-xl border border-[#34435b] bg-[#1c293d] p-3.5">
-        <CarFront size={22} className="shrink-0 text-[#ffda45]" />
+      <section className="mb-3 flex min-h-[56px] items-center gap-3 rounded-xl border border-[#34435b] bg-[#1c293d] px-3.5">
+        <CarFront size={21} className="shrink-0 text-[#ffda45]" />
         <div className="min-w-0 flex-1">
           <strong className="block text-sm">{job.vehicle}</strong>
-          <span className="mt-1 block text-xs text-[#aebbd0]">
-            Silver · ABC 1234
-          </span>
+          <span className="mt-1 block text-xs text-[#aebbd0]">Silver · ABC 1234</span>
         </div>
+        <ChevronDown size={17} className="text-[#aebbd0]" />
       </section>
 
       <section className="rounded-xl border border-[#34435b] bg-[#1c293d] p-3">
-        <div className="flex h-32 items-center justify-center rounded-lg bg-[#dce8e4] text-[#274b5d]">
-          <div className="flex items-center gap-2 rounded-full bg-[#10192d] px-3 py-2 text-xs font-semibold text-white">
-            <MapPin size={15} />
-            {job.distance} away
-          </div>
-        </div>
-
-        <div className="mt-3 flex items-center gap-3">
-          <span className="grid h-16 w-20 shrink-0 place-items-center rounded-lg bg-[#24364d] text-[#ffda45]">
+        <div className="flex items-center gap-3">
+          <div className="relative grid h-[72px] w-20 shrink-0 place-items-center overflow-hidden rounded-lg bg-gradient-to-br from-[#68746d] via-[#39443f] to-[#182436] text-[#ffda45]">
+            <span className="absolute inset-x-2 top-4 h-1 rounded-full bg-[#9da69b]/60" />
+            <span className="absolute inset-x-3 bottom-4 h-1 rounded-full bg-[#111827]/70" />
             <Wrench size={24} />
-          </span>
-          <div className="min-w-0">
+          </div>
+          <div className="min-w-0 flex-1">
             <strong className="block text-sm">{job.issue}</strong>
             <span className="mt-1 block text-xs leading-5 text-[#aebbd0]">
-              Parked near a safe shoulder.
+              Dashboard lights are dim. Parked on a safe shoulder.
             </span>
           </div>
         </div>
-
-        <div className="mt-3 flex items-center justify-between gap-3 text-xs">
-          <span className="inline-flex items-center gap-1.5 text-[#aebbd0]">
-            <MapPin size={15} />
-            {job.location}
+        <div className="mt-3 flex items-center justify-between gap-2 text-xs">
+          <span className="inline-flex min-w-0 items-center gap-1.5 text-[#aebbd0]">
+            <MapPin size={15} className="shrink-0" />
+            <span className="truncate">{job.location}</span>
           </span>
           <strong className="shrink-0">{job.distance}</strong>
         </div>
       </section>
 
-      <section className="mt-4 rounded-xl border border-[#34435b] bg-[#1c293d] p-3.5">
-        <h2 className="m-0 text-sm font-semibold">Visit estimate</h2>
-        <div className="mt-3 flex justify-between text-xs text-[#aebbd0]">
-          <span>Customer visit estimate</span>
-          <strong className="text-white">₱450</strong>
+      <section className="mt-3 rounded-xl border border-[#34435b] bg-[#1c293d] p-3.5">
+        <div className="mb-3 flex items-center justify-between gap-3 text-xs">
+          <span className="inline-flex items-center gap-2 text-[#aebbd0]">
+            <MapPin size={15} /> Travel ETA
+          </span>
+          <strong>12 min</strong>
         </div>
-        <div className="mt-2 flex justify-between text-xs text-[#aebbd0]">
-          <span>Platform fee · 10%</span>
-          <strong className="text-white">₱45</strong>
+        <div className="flex items-center justify-between gap-3 py-1.5 text-xs">
+          <span className="text-[#aebbd0]">Customer visit estimate</span>
+          <strong>₱450</strong>
         </div>
-        <div className="mt-3 flex justify-between border-t border-[#34435b] pt-3 text-sm">
-          <span>Estimated visit earnings</span>
+        <div className="flex items-center justify-between gap-3 py-1.5 text-xs">
+          <span className="text-[#aebbd0]">Platform fee · 10%</span>
+          <strong>₱45</strong>
+        </div>
+        <div className="mt-1 flex items-center justify-between gap-3 border-t border-[#34435b] pt-2 text-xs">
+          <span className="text-[#aebbd0]">Estimated visit earnings</span>
           <strong className="text-[#ffda45]">{formatPeso(job.estimate)}</strong>
         </div>
       </section>
 
-      <p className="mb-0 mt-3 text-xs leading-5 text-[#aebbd0]">
+      <p className="mb-0 mt-3 text-[10px] leading-4 text-[#aebbd0]">
         Repairs require a separate customer-approved quote.
       </p>
 
-      <div className="mt-5 flex flex-col gap-2">
+      <div className="mt-4 flex flex-col gap-2">
         <button
           type="button"
           onClick={acceptJob}
-          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[#ffda45] px-4 text-sm font-bold text-[#111827]"
+          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#ffda45] px-4 text-sm font-bold text-[#111827]"
         >
-          <ArrowRight size={18} />
+          <ArrowRight size={17} />
           Accept job
         </button>
         <button
           type="button"
           onClick={declineOffer}
-          className="min-h-12 rounded-xl bg-[#1c293d] px-4 text-sm font-semibold text-white"
+          className="min-h-10 rounded-xl bg-[#1c293d] px-4 text-sm font-semibold text-white"
         >
           Decline offer
         </button>

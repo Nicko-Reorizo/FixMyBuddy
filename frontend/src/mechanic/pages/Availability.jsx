@@ -39,6 +39,7 @@ export function Availability() {
   return (
     <div>
       <MechanicHeader
+        showBrand={false}
         title="Ready when they need you"
         subtitle="Your provider profile & availability"
       />

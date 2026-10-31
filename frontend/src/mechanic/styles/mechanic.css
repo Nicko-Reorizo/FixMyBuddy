@@ -11,6 +11,23 @@
   --mechanic-danger: #ff9b8f;
 }
 
+.mechanic-public-shell {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 488px;
+  min-height: 100dvh;
+  margin-inline: auto;
+  padding: max(12px, env(safe-area-inset-top)) 20px 24px;
+  background: #10192d;
+  color: var(--mechanic-text);
+}
+
+.mechanic-public-page {
+  display: flex;
+  min-height: calc(100dvh - 36px);
+  flex-direction: column;
+}
+
 .mechanic-page {
   min-height: 100%;
   color: var(--mechanic-text);

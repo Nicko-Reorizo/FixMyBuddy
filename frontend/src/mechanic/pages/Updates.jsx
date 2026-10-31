@@ -7,7 +7,6 @@ import {
   CircleHelp,
   CreditCard,
   Headphones,
-  Wrench,
 } from 'lucide-react';
 
 const initialUpdates = [
@@ -40,15 +39,6 @@ export function Updates() {
   return (
     <div className="pb-4">
       <header className="mb-5">
-        <div className="mb-3 flex items-center gap-3">
-          <span className="grid h-9 w-9 place-items-center rounded-xl bg-[#1c293d] text-[#ffda45]">
-            <Wrench size={18} />
-          </span>
-          <span className="text-sm font-medium">FixMyBuddy</span>
-          <span className="ml-auto rounded-md bg-[#ffda45] px-2.5 py-1 text-[10px] font-bold text-[#111827]">
-            PRO
-          </span>
-        </div>
         <h1 className="m-0 text-xl font-bold">Your Pro updates</h1>
         <p className="mb-0 mt-1 text-xs text-[#aebbd0]">
           Job alerts, account help and support.

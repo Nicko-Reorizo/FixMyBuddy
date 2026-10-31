@@ -10,6 +10,7 @@ import { JobTravel } from '../mechanic/pages/JobTravel';
 import { VerifyArrival } from '../mechanic/pages/VerifyArrival';
 import { Diagnosis } from '../mechanic/pages/Diagnosis';
 import { Quote } from '../mechanic/pages/Quote';
+import { AdditionalWork } from '../mechanic/pages/AdditionalWork';
 import { RepairProgress } from '../mechanic/pages/RepairProgress';
 import { TowingHandover } from '../mechanic/pages/TowingHandover';
 import { JobComplete } from '../mechanic/pages/JobComplete';
@@ -32,6 +33,7 @@ export function MechanicRoutes() {
         <Route path="jobs/:jobId/arrival" element={<VerifyArrival />} />
         <Route path="jobs/:jobId/diagnosis" element={<Diagnosis />} />
         <Route path="jobs/:jobId/quote" element={<Quote />} />
+        <Route path="jobs/:jobId/additional-work" element={<AdditionalWork />} />
         <Route path="jobs/:jobId/progress" element={<RepairProgress />} />
         <Route path="jobs/:jobId/handover" element={<TowingHandover />} />
         <Route path="jobs/:jobId/complete" element={<JobComplete />} />

@@ -4,6 +4,7 @@ import {
   ArrowLeft,
   Camera,
   Check,
+  CircleDollarSign,
   MessageCircle,
   Pencil,
 } from 'lucide-react';
@@ -67,6 +68,15 @@ export function RepairProgress() {
         ]}
       />
 
+      <button
+        type="button"
+        onClick={() => navigate(`/mechanic/jobs/${jobId || 'FMB-1042'}/additional-work`)}
+        className="mt-3 inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-xl border border-[#34435b] bg-[#1c293d] px-3 text-xs font-semibold text-[#ffda45]"
+      >
+        <CircleDollarSign size={16} />
+        Request additional work
+      </button>
+
       <form
         onSubmit={handleSubmit}
         className="mt-5 rounded-xl border border-[#34435b] bg-[#1c293d] p-3.5"
@@ -123,7 +133,7 @@ export function RepairProgress() {
 
       <button
         type="button"
-        onClick={() => navigate(`/mechanic/jobs/${jobId || 'FMB-1042'}/complete`)}
+        onClick={() => navigate(`/mechanic/jobs/${jobId || 'FMB-1042'}/handover`)}
         className="mt-5 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#ffda45] px-4 text-sm font-bold text-[#111827]"
       >
         <Check size={18} />

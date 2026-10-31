@@ -1,8 +1,11 @@
 import { useMemo, useState } from 'react';
-import { Clock3, Plus, Send, Trash2 } from 'lucide-react';
+import { Check, Clock3, Pencil, Plus, Send, Trash2 } from 'lucide-react';
 
 const defaultItems = [
   { id: 'diagnosis', label: 'Call-out & diagnosis', amount: 450 },
+  { id: 'battery', label: '12V battery · 1 × ₱3,500', amount: 3500 },
+  { id: 'labor', label: 'Installation labor', amount: 450 },
+  { id: 'fees', label: 'Customer / payment fees', amount: 0 },
 ];
 
 function formatPeso(value) {
@@ -17,12 +20,16 @@ export function QuoteEditor({
   initialItems = defaultItems,
   approvalStatus = 'Not sent',
   repairTime = '',
+  warrantyTerms = 'Battery: 12 months. Installation: 30 days. Covers defects and fitting faults.',
   onSubmit,
   submitLabel = 'Send for customer approval',
 }) {
   const [items, setItems] = useState(() =>
     initialItems.map((item) => ({ ...item })),
   );
+  const [editingId, setEditingId] = useState(null);
+  const [timeEstimate, setTimeEstimate] = useState(repairTime);
+  const [warranty, setWarranty] = useState(warrantyTerms);
 
   const total = useMemo(
     () => items.reduce((sum, item) => sum + (Number(item.amount) || 0), 0),
@@ -40,10 +47,9 @@ export function QuoteEditor({
   }
 
   function addItem() {
-    setItems((current) => [
-      ...current,
-      { id: createId(), label: '', amount: 0 },
-    ]);
+    const id = createId();
+    setItems((current) => [...current, { id, label: '', amount: 0 }]);
+    setEditingId(id);
   }
 
   function removeItem(id) {
@@ -52,104 +58,143 @@ export function QuoteEditor({
 
   function handleSubmit(event) {
     event.preventDefault();
-    onSubmit?.({ items, total, estimatedNet, repairTime });
+    onSubmit?.({
+      items,
+      total,
+      estimatedNet,
+      repairTime: timeEstimate,
+      warrantyTerms: warranty,
+    });
   }
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      <section className="rounded-xl border border-[#34435b] bg-[#1c293d] p-3.5">
-        <div className="mb-3 flex items-center justify-between gap-3">
+      <section className="rounded-xl border border-[#34435b] bg-[#1c293d] p-3">
+        <div className="mb-2 flex items-center justify-between gap-3">
           <h2 className="m-0 text-sm font-semibold">Parts &amp; labor</h2>
           <button
             type="button"
             onClick={addItem}
-            className="inline-flex min-h-9 items-center gap-1 text-xs font-semibold text-[#ffda45]"
+            className="inline-flex min-h-7 items-center gap-1 text-[10px] font-semibold text-[#ffda45]"
           >
             <Plus size={15} aria-hidden="true" />
             Add line
           </button>
         </div>
 
-        <div className="flex flex-col gap-3">
-          {items.map((item) => (
-            <div
-              key={item.id}
-              className="grid grid-cols-[minmax(0,1fr)_92px_36px] items-center gap-2"
-            >
-              <label className="sr-only" htmlFor={`${item.id}-label`}>
-                Line item description
-              </label>
-              <input
-                id={`${item.id}-label`}
-                value={item.label}
-                onChange={(event) =>
-                  updateItem(item.id, 'label', event.target.value)
-                }
-                placeholder="Describe the work or part"
-                className="min-h-10 min-w-0 rounded-lg border border-[#34435b] bg-[#10192d] px-2.5 text-xs text-white outline-none placeholder:text-[#7f8da3] focus:border-[#ffda45]"
-              />
+        <div className="flex flex-col gap-1">
+          {items.map((item) => {
+            const isEditing = editingId === item.id;
 
-              <label className="sr-only" htmlFor={`${item.id}-amount`}>
-                Amount in pesos
-              </label>
-              <input
-                id={`${item.id}-amount`}
-                type="number"
-                min="0"
-                step="1"
-                value={item.amount}
-                onChange={(event) =>
-                  updateItem(item.id, 'amount', event.target.value)
-                }
-                className="min-h-10 w-full rounded-lg border border-[#34435b] bg-[#10192d] px-2 text-right text-xs text-white outline-none focus:border-[#ffda45]"
-              />
-
-              <button
-                type="button"
-                onClick={() => removeItem(item.id)}
-                aria-label={`Remove ${item.label || 'line item'}`}
-                className="grid h-9 w-9 place-items-center rounded-lg text-[#aebbd0] hover:bg-white/5 hover:text-white"
+            return (
+              <div
+                key={item.id}
+                className="grid grid-cols-[16px_minmax(0,1fr)_auto] items-center gap-2 text-[10px]"
               >
-                <Trash2 size={16} aria-hidden="true" />
-              </button>
-            </div>
-          ))}
+                <button
+                  type="button"
+                  onClick={() => setEditingId(isEditing ? null : item.id)}
+                  aria-label={isEditing ? 'Finish editing line' : `Edit ${item.label}`}
+                  className="grid h-7 w-5 place-items-center text-[#aebbd0]"
+                >
+                  {isEditing ? <Check size={14} /> : <Pencil size={14} />}
+                </button>
+
+                {isEditing ? (
+                  <input
+                    aria-label="Line item description"
+                    value={item.label}
+                    onChange={(event) =>
+                      updateItem(item.id, 'label', event.target.value)
+                    }
+                    placeholder="Describe work or part"
+                    className="min-h-7 min-w-0 rounded border border-[#34435b] bg-[#10192d] px-2 text-[10px] text-white outline-none focus:border-[#ffda45]"
+                  />
+                ) : (
+                  <span className="min-w-0 text-[#aebbd0]">{item.label}</span>
+                )}
+
+                <div className="flex items-center gap-1.5">
+                  {isEditing ? (
+                    <input
+                      aria-label="Line item amount in pesos"
+                      type="number"
+                      min="0"
+                      step="1"
+                      value={item.amount}
+                      onChange={(event) =>
+                        updateItem(item.id, 'amount', event.target.value)
+                      }
+                      className="w-[72px] rounded border border-[#34435b] bg-[#10192d] px-1.5 py-1 text-right text-[10px] text-white outline-none focus:border-[#ffda45]"
+                    />
+                  ) : (
+                    <strong className="whitespace-nowrap">{formatPeso(item.amount)}</strong>
+                  )}
+                  {isEditing && (
+                    <button
+                      type="button"
+                      onClick={() => removeItem(item.id)}
+                      aria-label={`Remove ${item.label || 'line item'}`}
+                      className="grid h-7 w-6 place-items-center text-[#aebbd0]"
+                    >
+                      <Trash2 size={13} />
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
         </div>
 
-        <div className="mt-4 space-y-2 border-t border-[#34435b] pt-3 text-xs">
+        <div className="mt-2 space-y-1.5 border-t border-[#34435b] pt-2 text-[10px]">
           <div className="flex justify-between gap-3 text-[#aebbd0]">
             <span>Customer total</span>
             <strong className="text-[#ffda45]">{formatPeso(total)}</strong>
           </div>
           <div className="flex justify-between gap-3 text-[#aebbd0]">
-            <span>Estimated net after 10% fee</span>
+            <span>Est. net after 10% fee</span>
             <strong className="text-white">{formatPeso(estimatedNet)}</strong>
           </div>
         </div>
       </section>
 
-      <label className="flex min-h-12 items-center gap-2 rounded-xl border border-[#34435b] bg-[#1c293d] px-3 text-xs text-[#aebbd0]">
+      <label className="flex min-h-10 items-center gap-2 rounded-lg border border-[#34435b] bg-[#1c293d] px-2.5 text-[10px] text-[#aebbd0]">
         <Clock3 size={16} className="shrink-0 text-[#ffda45]" aria-hidden="true" />
         <span className="flex-1">Repair time estimate</span>
         <input
-          value={repairTime}
-          onChange={(event) => {
-            const value = event.target.value;
-            onSubmit?.({ draftRepairTime: value });
-          }}
+          value={timeEstimate}
+          onChange={(event) => setTimeEstimate(event.target.value)}
           placeholder="30–40 minutes"
-          className="w-32 bg-transparent text-right text-xs text-white outline-none placeholder:text-[#7f8da3]"
+          className="w-28 bg-transparent text-right text-[10px] text-white outline-none placeholder:text-[#7f8da3]"
         />
       </label>
 
-      <p className="m-0 rounded-lg bg-[#3b3420] px-3 py-2.5 text-xs leading-5 text-[#d7c98d]">
-        Approval status: {approvalStatus}. Work stays blocked until the
-        customer approves the quote.
+      <label className="block text-[10px] font-medium text-[#c4cede]">
+        Warranty terms
+        <span className="relative mt-1 block">
+          <textarea
+            value={warranty}
+            onChange={(event) => setWarranty(event.target.value)}
+            rows={2}
+            className="w-full resize-none rounded-lg border border-[#34435b] bg-[#1c293d] p-2.5 pr-8 text-[10px] leading-4 text-white outline-none focus:border-[#ffda45]"
+          />
+          <Pencil size={13} className="pointer-events-none absolute right-2.5 top-2.5 text-[#aebbd0]" />
+        </span>
+      </label>
+
+      <div className="rounded-lg bg-[#3b3420] px-2.5 py-2 text-[10px] leading-4 text-[#d7c98d]">
+        <p className="m-0 inline-flex items-center gap-1.5 font-medium">
+          <Clock3 size={13} className="text-[#ffda45]" />
+          Approval status: {approvalStatus}. The customer sees itemized costs and can approve or decline.
+        </p>
+      </div>
+      <p className="m-0 text-[10px] leading-4 text-[#aebbd0]">
+        Work stays blocked until Alex approves. If declined, only the ₱450 diagnostic visit is due.
       </p>
 
       <button
         type="submit"
-        className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[#ffda45] px-4 text-sm font-bold text-[#111827] hover:bg-[#ffe16a] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ffda45]"
+        className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-[#ffda45] px-4 text-[11px] font-bold text-[#111827] hover:bg-[#ffe16a] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ffda45]"
       >
         <Send size={17} aria-hidden="true" />
         {submitLabel}
